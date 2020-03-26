@@ -23,7 +23,7 @@ export default {
         session({commit}){
             commit(FETCH_SESSION)
             setTimeout(()=>{
-                commit(RECEIVE,{name:'Jose', admin:true})
+                commit(RECEIVE,{name:'Jose', admin:true,email:'jose@test.test',phone:666111222})
             },1000)
         }
     },

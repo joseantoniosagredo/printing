@@ -7,11 +7,20 @@
         <v-list-item three-line>
       <v-list-item-content>
         <div class="overline mb-4">Create new order</div>
-        <v-list-item-title class="headline mb-1">Headline 5</v-list-item-title>
-        <v-list-item-subtitle>Greyhound divisely hello coldly fonwderfully</v-list-item-subtitle>
-       
+        <div class="flex">
+        <v-list-item-content>
+            <v-list-item-title class="headline mb-1">Your information</v-list-item-title>
+            <!--<v-list-item-subtitle>Greyhound divisely hello coldly fonwderfully</v-list-item-subtitle>-->
+            <div><label>Phone</label><p>{{getUser.phone}}</p></div>
+            <div><label>Email</label><p>{{getUser.email}}</p></div>
+        </v-list-item-content>
+        <v-list-item-avatar
+        tile
+        size="80"
+        color="grey"></v-list-item-avatar>
+        </div>
             <InputCustom v-for="(value,key) in config" :key="key" :label="key" :type="value" v-model="values[key]"/>
-     
+             <v-file-input v-model="files" chips multiple label="File input"></v-file-input>
       </v-list-item-content>
         
     </v-list-item>
@@ -33,14 +42,15 @@ export default {
     },
     data(){
         return {
-            values:{}
+            values:{},
+            files:[]
         }
     },
     created(){
         this.fetchConfig()
     },
     computed:{
-        ...mapGetters(['config'])
+        ...mapGetters(['config','getUser'])
     },
     watch:{
         config(){
@@ -55,10 +65,21 @@ export default {
                 options[key] = this.values[key]
             })
             console.log(options)
+            console.log(this.files)
         }
     }
 }
 </script>
 <style scoped>
-
+    .flex {
+        display:flex;
+    }
+    label {
+        display: inline-block;
+        padding-right: 10px;
+        font-weight: bold;
+    }
+    p {
+        display: inline-block;
+    }
 </style>

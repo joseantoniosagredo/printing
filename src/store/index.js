@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import createLogger from 'vuex/dist/logger'
 import login from './login'
 import config from './config'
+import status from './status'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -10,5 +11,6 @@ export default new Vuex.Store({
     modules:{
         config,
         login,
+        status
     }
 })
