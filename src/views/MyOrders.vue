@@ -11,13 +11,12 @@
       <v-divider class="mx-4" vertical></v-divider>
       <v-row>
         <v-col v-for="order in fiteredOrders" v-bind:key="order._id">
-          <Order v-bind="order" />
+          <Order readOnly v-bind="order" />
         </v-col>
       </v-row>
     </v-col>
   </v-container>
 </template>
-
 <script>
 import Order from "@/components/Order";
 import StatusContainer from "@/components/StatusContainer";
@@ -51,6 +50,5 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 </style>

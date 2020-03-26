@@ -39,6 +39,13 @@ export const routes = [
     name: 'New Order',
     component: () => import('../views/NewOrder.vue'),
     admin:false
+  },
+  {
+    
+    path: '/profile/orders',
+    name: 'My Orders',
+    component: () => import('../views/MyOrders.vue'),
+    admin:false
   }
 ]
 

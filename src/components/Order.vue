@@ -1,5 +1,5 @@
 <template>
-  <v-card :disabled="closed">
+  <v-card :disabled="readOnly!==true && closed">
     <v-list-item three-line>
          <v-list-item-content> 
          <v-list-item-title class="headline mb-1">{{user.name + ' - ' + fileName}}</v-list-item-title>
@@ -30,7 +30,8 @@
     
     <v-card-actions>
       <v-btn outlined>Download File <v-icon right>mdi-download</v-icon></v-btn>
-      <StatusContainer mandatory :defaultValue="status._id" v-model="internalStatus"/>
+      <StatusContainer v-if="readOnly!==true" mandatory :defaultValue="status._id" v-model="internalStatus"/>
+      <v-btn v-else disabled>{{status.name}}</v-btn>
       <v-btn color='green' :disabled="modified"> Save <v-icon right>mdi-checkbox-marked-circle</v-icon></v-btn>
       
       
@@ -70,7 +71,8 @@ export default {
     options: {
       double: Boolean
     },
-    closed:{type:Boolean, required:true}
+    closed:{type:Boolean, required:true},
+    readOnly:{type:Boolean}
   },
   computed: {
       modified(){
