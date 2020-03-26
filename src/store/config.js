@@ -5,13 +5,15 @@ const RECEIVE = 'RECEIVE_CONFIG'
 export default {
     state:{
         config:{},
-        isFetching:false
+        isFetching:false,
+        invalidate:true
     },
     getters: {
         config: store => store.config,
     },
     actions:{
-        fetchConfig({commit}){
+        fetchConfig({commit,state}){
+            if(!state.invalidate) return 
             commit(FETCH)
             setTimeout(()=>{
                 commit(RECEIVE,{
@@ -25,6 +27,7 @@ export default {
     mutations:{
         [FETCH](state){
             state.isFetching = true
+            state.invalidate = false
         },
         [RECEIVE](state,data){
             state.isFetching = false
