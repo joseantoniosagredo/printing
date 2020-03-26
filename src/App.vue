@@ -23,6 +23,11 @@
           src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
           width="100"
         />
+        <div  class='link'>
+          <router-link v-for="(router,index) in routers" :key="index" :to="router.path" v-slot="{ href, route, navigate, isExactActive ,}">
+            <v-btn :color="isExactActive  ? 'secondary':'primary'" @click="navigate">{{route.name}}</v-btn>
+          </router-link>
+        </div>
       </div>
 
       <v-spacer></v-spacer>
@@ -47,6 +52,7 @@
 <script>
 import Login from '@/views/Login.vue'
 import {mapGetters, mapActions} from 'vuex'
+import {routes} from '@/router'
 export default {
   name: 'App',
 
@@ -54,16 +60,35 @@ export default {
     Login
   },
   data: () => ({
-    //
+    
   }),
   created(){
     this.session()
   },
   computed: {
     ...mapGetters(['getUser','init']),
+    routers(){
+      if(!this.getUser) return []
+      if(this.getUser && this.getUser.admin) return routes
+      return routes.filter(r => !r.admin)
+    }
   },
   methods: {
     ...mapActions(['session'])
   },
 };
 </script>
+
+<style scoped>
+.link {
+  padding-left: 10px;
+}
+.link a{
+  padding-right: 10px;
+  text-decoration: none;
+  color: white
+}
+.isActive {
+  color:blueviolet
+}
+</style>

@@ -1,4 +1,4 @@
-# tutorial
+# Printing
 
 ## Project setup
 ```
