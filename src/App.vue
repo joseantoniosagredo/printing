@@ -43,7 +43,9 @@
     </v-app-bar>
     <v-content v-if="init">
       <Login v-if="!getUser"/>
-      <router-view v-else/>
+      <transition v-else :name="transitionName"  mode="out-in">
+      <router-view />
+      </transition>
       
     </v-content>
   </v-app>
@@ -59,9 +61,11 @@ export default {
   components: {
     Login
   },
-  data: () => ({
-    
-  }),
+  data(){
+    return {
+      transitionName:'right-to-left'
+    }
+  },
   created(){
     this.session()
   },
@@ -76,6 +80,13 @@ export default {
   methods: {
     ...mapActions(['session'])
   },
+  watch:{
+    '$route'(to,from){
+      let toIndex = routes.findIndex(e => e.path===to.path)
+      let fromIndex = routes.findIndex(e => e.path===from.path)
+      this.transitionName = toIndex<fromIndex ? 'left-to-right':'right-to-left'
+    }
+  }
 };
 </script>
 
@@ -91,4 +102,28 @@ export default {
 .isActive {
   color:blueviolet
 }
+.left-to-right-enter-active, .left-to-right-leave-active  {
+  transition: .2s ease-in; 
+}
+.left-to-right-enter{
+  opacity: 0;
+  transform: translate(-400px,0)
+} 
+.left-to-right-leave-to /* .left-to-right-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translate(400px,0)
+}
+
+.right-to-left-enter-active, .right-to-left-leave-active  {
+  transition: .2s ease-in; 
+}
+.right-to-left-enter{
+  opacity: 0;
+  transform: translate(400px,0)
+} 
+.right-to-left-leave-to /* .right-to-left-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translate(-400px,0)
+}
+
 </style>
