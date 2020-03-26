@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 export default {
   props: {
     source: String
@@ -62,8 +62,9 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['isFetching']),
     loading() {
-      return this.$store.state.isFetching;
+      return this.isFetching
     }
   },
   methods: {

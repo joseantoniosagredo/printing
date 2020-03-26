@@ -32,6 +32,13 @@ export const routes = [
       next(true)
     },
     admin:true
+  },
+  {
+    
+    path: '/new',
+    name: 'New Order',
+    component: () => import('../views/NewOrder.vue'),
+    admin:false
   }
 ]
 

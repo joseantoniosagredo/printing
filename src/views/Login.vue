@@ -16,11 +16,12 @@ export default {
     LoginUI
   },
   computed:{
+    ...mapGetters(['getUser','isFetching']),
     user(){
-      return this.$store.state.user
+      return this.getUser
     },
     loading(){
-      return this.$store.state.isFetching
+      return this.isFetching
     },
     ...mapGetters(['getUser']),
   }

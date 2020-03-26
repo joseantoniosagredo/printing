@@ -1,15 +1,9 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import createLogger from 'vuex/dist/logger'
 
 const FETCH = 'FETCH'
 const FETCH_SESSION = 'FETCH_SESSION'
 const RECEIVE = 'RECEIVE'
 
-Vue.use(Vuex)
-
-export default new Vuex.Store({
-    plugins: [createLogger()],
+export default {
     state:{
         user:null,
         init:false,
@@ -48,4 +42,4 @@ export default new Vuex.Store({
         }
 
     }
-})
+}
