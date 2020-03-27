@@ -2,6 +2,7 @@ import axios from "axios"
 
 class HttpError extends Error {
     constructor(msg, error) {
+        super(msg)
         this.message = msg
         this.error = error
     }
@@ -29,10 +30,10 @@ class HttpError extends Error {
  *      actions:
  *          fetchOrders: 
  */
-export default ({ name, url, headers }, objectName) => {
+export default ({ name, url, headers,modifiedRequest,isArray }, objectName) => {
     if (name === undefined) throw new Error('Name is required')
     if (url === undefined) throw new Error('URL is required')
-
+    let isArrayInternal = isArray === false ? false : true
     const nameUpperCase = name.toUpperCase()
     const nameLowerCase = objectName || name.toLowerCase()
     const nameFirstUp = nameLowerCase.charAt(0).toUpperCase() + nameLowerCase.slice(1);
@@ -43,23 +44,25 @@ export default ({ name, url, headers }, objectName) => {
     const ERROR = 'ERROR_' + nameUpperCase
     return {
         state: {
-            [nameLowerCase]: [],
+            [nameLowerCase]: null,
             isFetching: false,
             invalidate: true
         },
         getters: {
-            [nameLowerCase]: store => store[nameLowerCase],
+            [nameLowerCase]: store => store[nameLowerCase] === null && isArrayInternal ? []: store[nameLowerCase],
         },
         actions: {
             ['fetch' + nameFirstUp]({ commit, state }) {
                 if (!state.invalidate) return
                 commit(FETCH)
-                axios.get({
-                    url,
+                axios.get(url, {
                     headers
                 }).then(response => {
-                    if (response.status === 200)
-                        return commit(RECEIVE, JSON.parse(response.data))
+                    if (response.status === 200) {
+                        const result = modifiedRequest ? modifiedRequest(response.data) : response.data
+                        return commit(RECEIVE, result)
+                    }
+
                     return commit(ERROR, new HttpError(response.data, response.status))
                 })
             }
@@ -71,9 +74,9 @@ export default ({ name, url, headers }, objectName) => {
             },
             [RECEIVE](state, data) {
                 state.isFetching = false
-                state.orders = data
+                state[nameLowerCase] = data
             },
-            [INVALIDATE](state, data) {
+            [INVALIDATE](state) {
                 state.isFetching = false
                 state.invalidate = true
             },

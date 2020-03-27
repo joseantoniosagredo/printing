@@ -19,7 +19,7 @@
         size="80"
         color="grey"></v-list-item-avatar>
         </div>
-            <InputCustom v-for="(value,key) in config" :key="key" :label="key" :type="value" v-model="values[key]"/>
+            <InputCustom v-for="(value,key) in config.options" :key="key" :label="key" :type="value" v-model="values[key]"/>
              <v-file-input v-model="files" chips multiple label="File input"></v-file-input>
       </v-list-item-content>
         
@@ -54,7 +54,9 @@ export default {
     },
     watch:{
         config(){
-            Object.keys(this.config).forEach(key => this.$set(this.values,key,''))    
+            console.log('_____________',this.config.options)
+            if(this.config && this.config.options)
+            Object.keys(this.config.options).forEach(key => this.$set(this.values,key,''))    
         },
     },
     methods:{
