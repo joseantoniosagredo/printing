@@ -2,9 +2,10 @@ import * as express from 'express'
 import routerApiRest from './routers/apiRest'
 import apiRouter from './routers/api'
 import fileRoute from './routers/file'
+import mongoose from './models'
 import * as session from 'express-session'
 import { SessionOptions } from 'express-session'
-import mongoose from './models'
+
 var path = require('path')
 const app = express()
 const MongoStore = require('connect-mongo')(session);

@@ -1,6 +1,6 @@
 version: '3'
 services:
-  app:
+  printing:
     build: .
     command: npm start
     restart: always

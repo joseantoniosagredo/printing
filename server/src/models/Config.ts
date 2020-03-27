@@ -9,5 +9,5 @@ const schema = new Schema({
     options:{type:Schema.Types.Mixed, required:true, default:{}}
 })
 
-export default model<Config & Document>(ModelsNames.ORDER, schema, ModelsNames.ORDER)
+export default model<Config & Document>(ModelsNames.CONFIG, schema, ModelsNames.CONFIG)
 

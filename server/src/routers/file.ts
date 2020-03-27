@@ -23,6 +23,7 @@ const upload = multer({
 route.post(urlFile, upload.array('file'), (req, res) => {
     console.log(req.body)
     console.log(req.file)
+    //install https://www.npmjs.com/package/pdfreader
     res.send()
 })
 

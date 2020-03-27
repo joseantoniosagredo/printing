@@ -3,5 +3,6 @@ export enum ModelsNames {
     USER = 'user',
     ORDER = 'order',
     FILE = 'file',
-    STATUS = 'status'
+    STATUS = 'status',
+    CONFIG = 'config'
 }
