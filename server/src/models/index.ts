@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose'
 
-mongoose.connect('mongodb://mongo:27017/plants')
+mongoose.connect('mongodb://mongo:27017/printing')
 
 export { default as User } from './User';
 export { default as Order } from './Order'
