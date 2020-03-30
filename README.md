@@ -1,4 +1,6 @@
 # Printing
+This web is a web interface for print shop in order to client do new orders.
+
 ## Backend
 Go to server file and exec
 ```
