@@ -49,7 +49,7 @@
       <v-col>
         <v-card>
           <form  @submit.prevent="onSubmitFiles">
-          <v-file-input name='files' v-model="files" chips multiple label="File input"></v-file-input>
+          <v-file-input :rules="rules" name='files' v-model="files" chips multiple label="File input"></v-file-input>
           <v-btn type="submit">submit files</v-btn>
           </form>
           <FilesTable v-model="mapSelected" show-select />
@@ -74,7 +74,12 @@ export default {
     return {
       selected: [],
       values: {},
-      files: []
+      files: [],
+      rules:[
+        (files)=>{
+          return files.every(file => file.name.endsWith('.pdf')) ? true:'Files must be a PDF'
+        }
+      ]
     };
   },
   created() {
@@ -115,8 +120,8 @@ export default {
       console.log(options);
       console.log(this.selected);
     },
-    onSubmitFiles(event){
-      console.log(event.target.files.value)
+    onSubmitFiles(){
+      console.log(this.files)
     }
   }
 };

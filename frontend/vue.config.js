@@ -2,6 +2,7 @@ module.exports = {
   "transpileDependencies": [
     "vuetify"
   ],
+  publicPath:'/pedidos',
   devServer: {
     proxy: {
       '^/api': {
