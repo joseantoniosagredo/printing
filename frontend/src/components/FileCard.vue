@@ -1,12 +1,19 @@
 <template>
-    <v-card>
+    <v-card class="card">
         <v-card-title>{{file.name}}</v-card-title>
-        <InputCustom :type="[1,2,4]" label='Group' v-model="computedGroup" />
-        <InputCustom type="number" label='Copies' v-model="computedCopies" />
-        <div>
-            <label>Final price</label>
-            <p>{{copies*pages}}€</p>
-        </div>
+        <v-card-text>
+            <InputCustom :type="[1,2,4]" label='Group' v-model="computedGroup" />
+            <InputCustom type="number" label='Copies' v-model="computedCopies" />
+            <div class="flex">
+                <v-checkbox label="Color?" v-model="computedColor"></v-checkbox>
+                <v-checkbox label="Binded?" v-model="computedBind"></v-checkbox>
+                <v-checkbox label = "Doble Sided?" v-model="computedDobleSided"></v-checkbox>
+            </div>
+            <div>
+                <label>Pages</label>
+                <p>{{totalPages}}</p>
+            </div>
+        </v-card-text>
     </v-card>
 </template>
 <script>
@@ -19,6 +26,7 @@
     }
  */
 import InputCustom from '@/components/InputCustom'
+import {calculatePages} from '@/utils'
 import { mapGetters } from "vuex";
 export default {
     components:{
@@ -31,7 +39,8 @@ export default {
         group:{type:Number, required:true},
         bind:{type:Boolean, required:true},
         copies:{type:Number, required:true},
-        pages:{type:Number,required:true}
+        pages:{type:Number,required:true},
+        color:{type:Boolean, required:true}
     },
     computed:{
         ...mapGetters(['config']),
@@ -50,8 +59,47 @@ export default {
             set(value){
                 this.$emit('update:copies',value)
             }
+        },
+        computedColor:{
+            get(){
+                return this.color
+            },
+            set(value){
+                this.$emit('update:color',value)
+            }
+        },
+        computedDobleSided:{
+            get(){
+                return this.dobleSided
+            },
+            set(value){
+                this.$emit('update:dobleSided',value)
+            }
+        },
+        
+        computedBind:{
+            get(){
+                return this.bind
+            },
+            set(value){
+                this.$emit('update:bind',value)
+            }
+        },
+        totalPages(){
+            return calculatePages(this.pages,this.group,this.dobleSided,this.copies)
         }
     }
 
 }
 </script>
+
+<style lang="stylus" scoped>
+.flex {
+    display flex
+}
+.card {
+    padding 5px
+    margin 10px
+    background-color #efefef
+}
+</style>

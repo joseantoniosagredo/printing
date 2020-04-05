@@ -34,9 +34,13 @@
                 <FileCard
                   v-for="file in selected"
                   :key="file.file.name"
-                  v-bind="file"
+                  :file="file.file"
                   :group.sync="file.group"
-                  :copies.sync="file.copies "
+                  :copies.sync="file.copies"
+                  :bind.sync="file.bind"
+                  :dobleSided.sync="file.dobleSided"
+                  :color.sync="file.color"
+                  :pages='file.pages'
                 />
               </v-list-item-content>
             </v-list-item>
@@ -52,7 +56,7 @@
         <v-card>
           <form  @submit.prevent="onSubmitFiles">
           <v-file-input :rules="rules" name='files' v-model="files" chips multiple label="File input"></v-file-input>
-          <v-btn type="submit">submit files</v-btn>
+          <v-btn :disabled='files.length==0' type="submit">upload files</v-btn>
           </form>
           <FilesTable :selected="selected" @delete="onRemoveFile" />
         </v-card>
@@ -112,7 +116,6 @@ export default {
     },
     onSubmitFiles(){
       const data = new FormData()
-      console.log(this.files)
       this.files.forEach(f => data.append(f.name,f))
       pageOf(data,(err,data)=>{
         if(err) console.error(err)
@@ -122,14 +125,13 @@ export default {
           group: 1,
           bind: false,
           copies: 1,
+          color:false,
           pages:parseInt(data[f.name])
         }))
       })
     },
     onRemoveFile(name){
-      console.log(name)
       let index = this.selected.findIndex(e => e.file.name === name)
-      console.log(index)
       if(index>=0){
         this.selected.splice(index,1)
       }
@@ -148,5 +150,8 @@ label {
 }
 p {
   display: inline-block;
+}
+.fileCard {
+  padding:5px
 }
 </style>
