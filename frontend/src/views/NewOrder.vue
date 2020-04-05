@@ -22,6 +22,7 @@
                   </v-list-item-content>
                   <v-list-item-avatar tile size="80" color="grey"></v-list-item-avatar>
                 </div>
+                <div v-if="config">
                 <InputCustom
                   v-for="(value,key) in config.options"
                   :key="key"
@@ -29,9 +30,10 @@
                   :type="value"
                   v-model="values[key]"
                 />
+                </div>
                 <FileCard
                   v-for="file in selected"
-                  :key="file.file._id"
+                  :key="file.file.name"
                   v-bind="file"
                   :group.sync="file.group"
                   :copies.sync="file.copies "
@@ -52,7 +54,7 @@
           <v-file-input :rules="rules" name='files' v-model="files" chips multiple label="File input"></v-file-input>
           <v-btn type="submit">submit files</v-btn>
           </form>
-          <FilesTable v-model="mapSelected" show-select />
+          <FilesTable :selected="selected" @delete="onRemoveFile" />
         </v-card>
       </v-col>
     </v-row>
@@ -63,6 +65,7 @@
 import InputCustom from "@/components/InputCustom";
 import FilesTable from "@/components/FilesTable";
 import FileCard from "@/components/FileCard";
+import { pageOf } from "@/Api"
 import { mapGetters, mapActions } from "vuex";
 export default {
   components: {
@@ -87,20 +90,7 @@ export default {
   },
   computed: {
     ...mapGetters(["config", "getUser"]),
-    mapSelected: {
-      get() {
-        return this.selected.map(f => f.file);
-      },
-      set(selected) {
-        this.selected = selected.map(f => ({
-          file: f,
-          dobleSided: false,
-          group: 1,
-          bind: false,
-          copies: 1
-        }));
-      }
-    }
+    
   },
   watch: {
     config() {
@@ -121,7 +111,28 @@ export default {
       console.log(this.selected);
     },
     onSubmitFiles(){
+      const data = new FormData()
       console.log(this.files)
+      this.files.forEach(f => data.append(f.name,f))
+      pageOf(data,(err,data)=>{
+        if(err) console.error(err)
+         this.selected = this.files.map(f => ({
+          file: f,
+          dobleSided: false,
+          group: 1,
+          bind: false,
+          copies: 1,
+          pages:parseInt(data[f.name])
+        }))
+      })
+    },
+    onRemoveFile(name){
+      console.log(name)
+      let index = this.selected.findIndex(e => e.file.name === name)
+      console.log(index)
+      if(index>=0){
+        this.selected.splice(index,1)
+      }
     }
   }
 };

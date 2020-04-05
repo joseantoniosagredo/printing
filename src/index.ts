@@ -19,7 +19,7 @@ var options: SessionOptions = {
 app.use(express.static(path.join(__dirname, '..', 'public')))
 app.use(session(options))
 app.get('/', (req, res) => res.send('Hello Word'))
-app.use(fileRoute)
+app.use('/api',fileRoute)
 app.use('/api', apiRouter)
 app.use('/api/rest', routerApiRest)
 app.use('/api/rest', routerApiRest.publishUiTree())
