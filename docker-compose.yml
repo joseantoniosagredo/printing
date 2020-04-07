@@ -8,6 +8,7 @@ services:
       - "82:80"
     volumes:
       - .:/app
+      - orders:/orders
     depends_on:
       - mongo
   mongo:
@@ -56,6 +57,7 @@ services:
       - db-wordpress:/var/lib/mysql
 
 volumes:
+  orders:
   db-data:
   mongo-config:
   db-wordpress:

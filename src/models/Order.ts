@@ -17,12 +17,12 @@ const schema = new Schema({
     user: { type: Types.ObjectId, ref: ModelsNames.USER },
     date: { type: String, required: true },
     status: { type: Types.ObjectId, ref: ModelsNames.STATUS },
-    files: {
+    files: [{
         file: { type: Types.ObjectId, ref: ModelsNames.FILE },
         doubleSided: { type: Boolean, required: true },
         group: { type: Number, required: true },
         bind: { type: Boolean, required: true },
-    },
+    }],
     closed: { type: Boolean, required: true,default:false },
 })
 

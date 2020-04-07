@@ -1,12 +1,10 @@
 import { Document, Schema, model, Types } from 'mongoose'
 import { ModelsNames } from './enums';
 
-type FileType = {
-    user: Types.ObjectId
+export type FileType = {
+    //user: Types.ObjectId
     /** Field name specified in the form */
-    fieldname: string;
-    /** Name of the file on the user's computer */
-    originalname: string;
+    originalName: string;
     /** Encoding type of the file */
     encoding: string;
     /** Mime type of the file */
@@ -16,20 +14,19 @@ type FileType = {
     /** The folder to which the file has been saved (DiskStorage) */
     destination: string;
     /** The url where to get the uploaded file (aws S3 for example) */
-    //location: string;
-    /** The name of the file within the destination (DiskStorage) */
     filename: string;
     /** Location of the uploaded file (DiskStorage) */
     path: string;
     /** A Buffer of the entire file (MemoryStorage) */
     //buffer: Buffer;
     pages: number
-} & Document
+    //urlStorage: string
+    deleted?: boolean
+}
 
 const schema = new Schema<FileType>({
-    user: { type: Types.ObjectId, required: true },
-    fieldname: { type: String, required: true },
-    originalname: { type: String, required: true },
+    //user: { type: Types.ObjectId, required: true },
+    originalName: { type: String, required: true },
     encoding: { type: String, required: true },
     mimetype: { type: String, required: true },
     size: { type: Number, required: true },
@@ -37,7 +34,9 @@ const schema = new Schema<FileType>({
     filename: { type: String, required: true },
     path: { type: String, required: true },
     //buffer: { type: String, required: true },
+    //urlStorage: {type:String, required: true},
     pages: { type: Number, required: true },
+    deleted: { type: Boolean, default: false },
 })
 
-export default model<FileType>(ModelsNames.FILE, schema, ModelsNames.FILE)
+export default model<FileType & Document>(ModelsNames.FILE, schema, ModelsNames.FILE)

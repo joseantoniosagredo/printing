@@ -1,6 +1,6 @@
 FROM node
 RUN mkdir /app
-RUN mkdir /images/
+RUN mkdir /orders/
 COPY . /app
 WORKDIR /app
 RUN npm install -g typescript

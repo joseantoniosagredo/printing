@@ -23,13 +23,13 @@
                   <v-list-item-avatar tile size="80" color="grey"></v-list-item-avatar>
                 </div>
                 <div v-if="config">
-                <InputCustom
-                  v-for="(value,key) in config.options"
-                  :key="key"
-                  :label="key"
-                  :type="value"
-                  v-model="values[key]"
-                />
+                  <InputCustom
+                    v-for="(value,key) in config.options"
+                    :key="key"
+                    :label="key"
+                    :type="value"
+                    v-model="values[key]"
+                  />
                 </div>
                 <FileCard
                   v-for="file in selected"
@@ -40,13 +40,12 @@
                   :bind.sync="file.bind"
                   :dobleSided.sync="file.dobleSided"
                   :color.sync="file.color"
-                  :pages='file.pages'
+                  :pages="file.pages"
                 />
               </v-list-item-content>
             </v-list-item>
-
             <v-card-actions>
-              <v-btn type="submit" text>Submit</v-btn>
+              <v-btn @click="submitOrder">Submit</v-btn>
               <v-btn text>Button</v-btn>
             </v-card-actions>
           </form>
@@ -54,9 +53,16 @@
       </v-col>
       <v-col>
         <v-card>
-          <form  @submit.prevent="onSubmitFiles">
-          <v-file-input :rules="rules" name='files' v-model="files" chips multiple label="File input"></v-file-input>
-          <v-btn :disabled='files.length==0' type="submit">upload files</v-btn>
+          <form @submit.prevent="onSubmitFiles">
+            <v-file-input
+              :rules="rules"
+              name="files"
+              v-model="files"
+              chips
+              multiple
+              label="File input"
+            ></v-file-input>
+            <v-btn :disabled="files.length==0" type="submit">upload files</v-btn>
           </form>
           <FilesTable :selected="selected" @delete="onRemoveFile" />
         </v-card>
@@ -69,7 +75,7 @@
 import InputCustom from "@/components/InputCustom";
 import FilesTable from "@/components/FilesTable";
 import FileCard from "@/components/FileCard";
-import { pageOf } from "@/Api"
+import { pageOf, postOrder } from "@/Api";
 import { mapGetters, mapActions } from "vuex";
 export default {
   components: {
@@ -82,9 +88,11 @@ export default {
       selected: [],
       values: {},
       files: [],
-      rules:[
-        (files)=>{
-          return files.every(file => file.name.endsWith('.pdf')) ? true:'Files must be a PDF'
+      rules: [
+        files => {
+          return files.every(file => file.name.endsWith(".pdf"))
+            ? true
+            : "Files must be a PDF";
         }
       ]
     };
@@ -93,8 +101,7 @@ export default {
     this.fetchConfig();
   },
   computed: {
-    ...mapGetters(["config", "getUser"]),
-    
+    ...mapGetters(["config", "getUser"])
   },
   watch: {
     config() {
@@ -106,34 +113,48 @@ export default {
   },
   methods: {
     ...mapActions(["fetchConfig"]),
-    submit() {
+    submitOrder() {
+      console.log("SUBMIT");
       let options = {};
-      Object.keys(this.config).forEach(key => {
-        options[key] = this.values[key];
-      });
+      if (this.config)
+        Object.keys(this.config).forEach(key => {
+          options[key] = this.values[key];
+        });
       console.log(options);
       console.log(this.selected);
+      const data = new FormData();
+      data.append('metadata',this.selected.reduce((obj,e)=>{
+        const {file,...metadata} = e
+        file
+        obj[file.name]= metadata
+        return obj
+      },{}))
+      //THere are no problem because all file ended in .pdf
+      this.selected.forEach(f => data.append(f.file.name, f.file));
+
+      postOrder(data, () => {});
     },
-    onSubmitFiles(){
-      const data = new FormData()
-      this.files.forEach(f => data.append(f.name,f))
-      pageOf(data,(err,data)=>{
-        if(err) console.error(err)
-         this.selected = this.files.map(f => ({
+    onSubmitFiles() {
+      const data = new FormData();
+      this.files.forEach(f => data.append(f.name, f));
+      pageOf(data, (err, data) => {
+        if (err) console.error(err);
+        this.selected = this.files.filter(f =>data[f.name]!==undefined ).map(f => ({
           file: f,
           dobleSided: false,
           group: 1,
           bind: false,
           copies: 1,
-          color:false,
-          pages:parseInt(data[f.name])
-        }))
-      })
+          color: false,
+          pages: parseInt(data[f.name])
+        }));
+        if(this.files.length!==this.files.filter(f =>data[f.name]!==undefined )) console.warn('Some file is not a PDF')
+      });
     },
-    onRemoveFile(name){
-      let index = this.selected.findIndex(e => e.file.name === name)
-      if(index>=0){
-        this.selected.splice(index,1)
+    onRemoveFile(name) {
+      let index = this.selected.findIndex(e => e.file.name === name);
+      if (index >= 0) {
+        this.selected.splice(index, 1);
       }
     }
   }
@@ -152,6 +173,6 @@ p {
   display: inline-block;
 }
 .fileCard {
-  padding:5px
+  padding: 5px;
 }
 </style>
