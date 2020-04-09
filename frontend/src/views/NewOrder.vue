@@ -77,6 +77,7 @@ import FilesTable from "@/components/FilesTable";
 import FileCard from "@/components/FileCard";
 import { pageOf, postOrder } from "@/Api";
 import { mapGetters, mapActions } from "vuex";
+var id = 1
 export default {
   components: {
     InputCustom,
@@ -123,15 +124,14 @@ export default {
       console.log(options);
       console.log(this.selected);
       const data = new FormData();
-      data.append('metadata',this.selected.reduce((obj,e)=>{
-        const {file,...metadata} = e
-        file
-        obj[file.name]= metadata
-        return obj
-      },{}))
+      
+      data.append('metadata',JSON.stringify(this.selected.map(e => {
+        const {file,...metadata} = e // eslint-disable-line 
+        return metadata
+      })))
+        
       //THere are no problem because all file ended in .pdf
-      this.selected.forEach(f => data.append(f.file.name, f.file));
-
+      this.selected.forEach(f => data.append(f.id, f.file));
       postOrder(data, () => {});
     },
     onSubmitFiles() {
@@ -146,6 +146,7 @@ export default {
           bind: false,
           copies: 1,
           color: false,
+          id: id++,
           pages: parseInt(data[f.name])
         }));
         if(this.files.length!==this.files.filter(f =>data[f.name]!==undefined )) console.warn('Some file is not a PDF')

@@ -1,13 +1,25 @@
 import { Router, Request } from 'express'
 import { Types } from 'mongoose';
 import { File } from '../models';
-import { FileType } from '../models/File'
+import { FileType, FileDocumentType } from '../models/File'
 import * as upload from 'express-fileupload'
 import * as pdf from 'pdf-parse'
 import { createFile } from '../cloud/google/storage';
 import * as fs from 'fs'
+import Order, { OrderType, FileOrderType, FileOrderPopulatedType } from '../models/Order';
+import { getDefaultStatus } from '../repository/StatusRepository';
+import { calculatePrice } from '../repository/ConfigRepository';
 const route = Router()
 type File = upload.UploadedFile
+
+type Metadata = {
+    dobleSided: boolean,
+    group: number,
+    bind: boolean,
+    copies: number,
+    color: boolean,
+    id: number,
+}
 route.use(upload({
     useTempFiles: false,
     tempFileDir: '/tmp',
@@ -19,20 +31,22 @@ route.post('/order', (req: Request & { files: { [name: string]: File } }, res) =
     console.log('_______________________________')
     console.log(req.files)
     console.log(JSON.stringify(req.body))
-    if(!req.files || Object.keys(req.files).length===0) return res.status(400).send('Upload at lest 1 file')
+    var metadata: Metadata[] = JSON.parse(req.body.metadata)
+
+    if (!req.files || Object.keys(req.files).length === 0) return res.status(400).send('Upload at lest 1 file')
     const orderId = new Types.ObjectId()
     fs.mkdir(`/orders/${orderId.toString()}`, (err) => {
         if (err) return res.status(500).send(err)
-        Promise.all(Object.keys(req.files).map(name => new Promise((resolve, reject) => {
+        Promise.all(Object.keys(req.files).map(webId => new Promise<{ file: FileDocumentType, webId: number }>((resolve, reject) => {
             let id = new Types.ObjectId()
-            let file = req.files[name]
+            let file = req.files[webId]
             const path = `/orders/${orderId.toString()}/${id.toString()}.pdf`
             file.mv(path, err => {
                 if (err) return reject(err)
                 pdf(file.data).then(pages => {
                     let fileJson: FileType = {
                         destination: path,
-                        filename:id.toString(),
+                        filename: id.toString(),
                         originalName: file.name,
                         pages: pages.numpages,
                         mimetype: file.mimetype,
@@ -40,17 +54,56 @@ route.post('/order', (req: Request & { files: { [name: string]: File } }, res) =
                         size: file.size,
                         encoding: file.encoding,
                     }
-                    let newFile = new File({_id:id,...fileJson})
+                    let newFile = new File({ _id: id, ...fileJson })
                     newFile.save((err, fileDB) => {
                         if (err) return reject(err)
-                        resolve(fileDB)
+                        resolve({ file: fileDB, webId: parseInt(webId) })
                     })
                 }).catch(reject)
 
             })
         }))).then((files) => {
+            if (files.some(obj => metadata.find(e => e.id === obj.webId) === undefined))
+                return res.status(400).send('Some metadata is wrong')
+            getDefaultStatus((err, status) => {
+                if (err) return res.status(500).send(err)
+                if (!status) return res.status(500).send('There aren\'t default status')
+                let error: string | null = null
+                let fileOrder: FileOrderPopulatedType[] = files.map(obj => {
+                    let meta = metadata.find(e => e.id === obj.webId)
+                    if (meta)
+                        return {
+                            file: obj.file,
+                            bind: meta.bind,
+                            doubleSided: meta.dobleSided,
+                            group: meta.group,
+                            color: meta.color,
+                            copies: meta.copies
+                        }
+                    else
+                        error = 'Metadata of id: ' + obj.webId + ' not found \n ' + JSON.stringify(metadata)
 
-            res.send(files)
+                })
+                if (error) res.status(400).send(error)
+                calculatePrice(fileOrder, (err, price) => {
+                    if (err) return res.status(500).send(err)
+                    let order: OrderType = {
+                        files: fileOrder.map(file => ({ ...file, file: file.file._id })),
+                        closed: false,
+                        status: status._id,
+                        date: new Date(),
+                        user: new Types.ObjectId, //TODO
+                        price: price
+                    }
+                    let orderdb = new Order(order)
+                    orderdb.save(err => {
+                        if (err) return res.status(500).send(err)
+                        res.send(orderdb)
+                    })
+
+                })
+            })
+
         }).catch(err => res.status(500).send(err))
     })
 })

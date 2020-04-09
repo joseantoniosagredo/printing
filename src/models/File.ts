@@ -23,7 +23,7 @@ export type FileType = {
     //urlStorage: string
     deleted?: boolean
 }
-
+export type FileDocumentType = FileType & Document
 const schema = new Schema<FileType>({
     //user: { type: Types.ObjectId, required: true },
     originalName: { type: String, required: true },
@@ -39,4 +39,4 @@ const schema = new Schema<FileType>({
     deleted: { type: Boolean, default: false },
 })
 
-export default model<FileType & Document>(ModelsNames.FILE, schema, ModelsNames.FILE)
+export default model<FileDocumentType>(ModelsNames.FILE, schema, ModelsNames.FILE)

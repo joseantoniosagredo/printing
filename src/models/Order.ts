@@ -1,17 +1,29 @@
 import { Document, Schema, model, Types } from 'mongoose'
 import { ModelsNames } from './enums';
-
+import { FileType, FileDocumentType } from './File';
+export type FileOrderType = {
+    file: Types.ObjectId
+    doubleSided: boolean,
+    group: number,
+    bind: boolean,
+    color:boolean,
+    copies:number
+}
+export type FileOrderPopulatedType = {
+    file: FileDocumentType
+    doubleSided: boolean,
+    group: number,
+    bind: boolean,
+    color:boolean,
+    copies:number
+}
 export type OrderType = {
     user: Types.ObjectId,
     status: Types.ObjectId,
-    files: {
-        file: Types.ObjectId
-        doubleSided: boolean,
-        group: number,
-        bind: boolean
-    }[],
+    files: FileOrderType[],
     closed: boolean,
     date: Date,
+    price:number
 }
 const schema = new Schema({
     user: { type: Types.ObjectId, ref: ModelsNames.USER },
@@ -22,8 +34,11 @@ const schema = new Schema({
         doubleSided: { type: Boolean, required: true },
         group: { type: Number, required: true },
         bind: { type: Boolean, required: true },
+        color: { type: Boolean, required: true },
+        copies: { type: Number, required: true },
     }],
     closed: { type: Boolean, required: true,default:false },
+    price: { type: Number, required: true },
 })
 
 export default model<OrderType & Document>(ModelsNames.ORDER, schema, ModelsNames.ORDER)
