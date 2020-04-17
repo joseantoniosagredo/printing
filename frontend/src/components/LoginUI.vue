@@ -6,15 +6,11 @@
           <v-toolbar color="primary" dark flat>
             <v-toolbar-title>Login form</v-toolbar-title>
             <v-spacer/>
-            <v-tooltip>
-              <template v-slot:activator="{ on }">
-                <v-btn :href="source" large target="_blank" v-on="on">
+               <v-btn large target="_blank" @click="$emit('registration')">
                   registration
                   <v-icon right>mdi-code-tags</v-icon>
                 </v-btn>
-              </template>
-              <span>Source</span>
-            </v-tooltip>
+           
           </v-toolbar>
           <v-form v-on:submit.prevent="onSubmit">
             <v-card-text>
@@ -73,7 +69,7 @@ export default {
       if (!this.user || !this.password)
         return (this.error = "Please complete all fields");
       this.error = "";
-      this.fetchUser({ username: this.username, password: this.password });
+      this.fetchUser({ username: this.user, password: this.password });
     }
   }
 };

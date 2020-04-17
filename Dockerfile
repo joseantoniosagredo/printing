@@ -1,4 +1,4 @@
-FROM node
+FROM node:12.16.2
 RUN mkdir /app
 RUN mkdir /orders/
 COPY . /app

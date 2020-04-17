@@ -2,10 +2,11 @@ import * as express from 'express'
 import routerApiRest from './routers/apiRest'
 import apiRouter from './routers/api'
 import fileRoute from './routers/file'
+import loginRoute from './routers/login'
 import mongoose from './models'
 import * as session from 'express-session'
 import { SessionOptions } from 'express-session'
-
+import * as bodyParse from 'body-parser'
 var path = require('path')
 const app = express()
 const MongoStore = require('connect-mongo')(session);
@@ -17,10 +18,12 @@ var options: SessionOptions = {
     })
 }
 app.use(express.static(path.join(__dirname, '..', 'public')))
+app.use(bodyParse.json())
 app.use(session(options))
 app.get('/', (req, res) => res.send('Hello Word'))
 app.use('/api',fileRoute)
 app.use('/api', apiRouter)
+app.use('/api', loginRoute)
 app.use('/api/rest', routerApiRest)
 app.use('/api/rest', routerApiRest.publishUiTree())
 app.listen(80, () => {

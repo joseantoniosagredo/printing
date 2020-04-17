@@ -1,8 +1,10 @@
 
 const FETCH = 'FETCH'
 const FETCH_SESSION = 'FETCH_SESSION'
+const ERROR_SESSION = 'ERROR_SESSION'
 const RECEIVE = 'RECEIVE'
-
+import axios from 'axios'
+import { login } from '../Api'
 export default {
     state:{
         user:null,
@@ -16,15 +18,16 @@ export default {
     actions:{
         fetchUser({commit},input){
             commit(FETCH)
-            setTimeout(()=>{
-                commit(RECEIVE,input)
-            },1000)
+            login(input.username,input.password,(err,user)=>{
+                if(err) return commit(ERROR_SESSION,err)
+                commit(RECEIVE,user)
+            })
         },
         session({commit}){
             commit(FETCH_SESSION)
-            setTimeout(()=>{
-                commit(RECEIVE,{name:'Jose', admin:true,email:'jose@test.test',phone:666111222})
-            },1000)
+            axios.get('/api/session').then(response => {
+                commit(RECEIVE,response.data)
+            }).catch(err => commit(ERROR_SESSION,err))
         }
     },
     mutations:{
@@ -39,7 +42,12 @@ export default {
             state.init = true
             state.isFetching = false
             state.user = data
-        }
+        },
+        [ERROR_SESSION](state){
+            state.isFetching = false
+            state.init = true
+            
+        },
 
     }
 }
