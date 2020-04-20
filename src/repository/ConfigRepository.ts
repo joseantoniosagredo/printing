@@ -17,11 +17,11 @@ export function calculatePrice(data: FileOrderPopulatedType[], cb: (err: Error |
         const priceColor = color.map(file =>{
             var pages = calculatePages(file.file.pages,file.group,file.doubleSided,file.copies)
             return config.priceColor.find(price => price.start <= pages && (!price.end || price.end >= pages)).value * pages
-        }).reduce((a, b) => a + b)
+        }).reduce((a, b) => a + b,0)
         const priceWnB = wnb.map(file =>{
             var pages = calculatePages(file.file.pages,file.group,file.doubleSided,file.copies)
             return config.priceWnB.find(price => price.start <= pages && (!price.end || price.end >= pages)).value * pages
-        }).reduce((a, b) => a + b)
+        }).reduce((a, b) => a + b,0)
         cb(null, priceColor + priceWnB)
     })
 }

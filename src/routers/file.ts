@@ -9,9 +9,7 @@ import * as fs from 'fs'
 import Order, { OrderType, FileOrderType, FileOrderPopulatedType } from '../models/Order';
 import { getDefaultStatus } from '../repository/StatusRepository';
 import { calculatePrice } from '../repository/ConfigRepository';
-const route = Router()
 type File = upload.UploadedFile
-
 type Metadata = {
     dobleSided: boolean,
     group: number,
@@ -20,6 +18,9 @@ type Metadata = {
     color: boolean,
     id: number,
 }
+
+const route = Router()
+
 route.use(upload({
     useTempFiles: false,
     tempFileDir: '/tmp',
@@ -28,11 +29,8 @@ route.use(upload({
 }))
 //default path file insede 
 route.post('/order', (req: Request & { files: { [name: string]: File } }, res) => {
-    console.log('_______________________________')
-    console.log(req.files)
-    console.log(JSON.stringify(req.body))
+    let user = req.session.user
     var metadata: Metadata[] = JSON.parse(req.body.metadata)
-
     if (!req.files || Object.keys(req.files).length === 0) return res.status(400).send('Upload at lest 1 file')
     const orderId = new Types.ObjectId()
     fs.mkdir(`/orders/${orderId.toString()}`, (err) => {
@@ -92,7 +90,7 @@ route.post('/order', (req: Request & { files: { [name: string]: File } }, res) =
                         closed: false,
                         status: status._id,
                         date: new Date(),
-                        user: new Types.ObjectId, //TODO
+                        user: user, //TODO
                         price: price
                     }
                     let orderdb = new Order(order)

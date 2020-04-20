@@ -20,10 +20,13 @@ var options: SessionOptions = {
 app.use(express.static(path.join(__dirname, '..', 'public')))
 app.use(bodyParse.json())
 app.use(session(options))
-app.get('/', (req, res) => res.send('Hello Word'))
+app.use('/api', loginRoute)
+app.use((req,res,next)=>{
+    if(req.session.user) return next()
+    res.status(401).send('User not logged')
+})
 app.use('/api',fileRoute)
 app.use('/api', apiRouter)
-app.use('/api', loginRoute)
 app.use('/api/rest', routerApiRest)
 app.use('/api/rest', routerApiRest.publishUiTree())
 app.listen(80, () => {
