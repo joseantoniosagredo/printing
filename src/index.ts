@@ -2,6 +2,7 @@ import * as express from 'express'
 import routerApiRest from './routers/apiRest'
 import apiRouter from './routers/api'
 import fileRoute from './routers/file'
+import adminRouter from './routers/admin'
 import loginRoute from './routers/login'
 import mongoose from './models'
 import * as session from 'express-session'
@@ -27,6 +28,7 @@ app.use((req,res,next)=>{
 })
 app.use('/api',fileRoute)
 app.use('/api', apiRouter)
+app.use('/api/admin',adminRouter)
 app.use('/api/rest', routerApiRest)
 app.use('/api/rest', routerApiRest.publishUiTree())
 app.listen(80, () => {
