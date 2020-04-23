@@ -1,17 +1,17 @@
 <template>
   <v-container>
-    <v-col cols="12" >
+    <v-col cols="12">
       <v-row>
         <v-toolbar dense>
           <v-toolbar-title>Filters</v-toolbar-title>
-          <v-text-field label='Name' v-model="filter" />
-          <StatusContainer :value="status" @input="(id)=>status=status===id?null:id"/>
+          <v-text-field label="Name" v-model="filter" />
+          <StatusContainer :value="status" @input="(id)=>status=status===id?null:id" />
         </v-toolbar>
       </v-row>
       <v-divider class="mx-4" vertical></v-divider>
       <v-row>
         <v-col v-for="order in fiteredOrders" v-bind:key="order._id">
-          <Order readOnly v-bind="order" />
+          <Order readonly v-bind="order" />
         </v-col>
       </v-row>
     </v-col>
@@ -20,7 +20,7 @@
 <script>
 import Order from "@/components/Order";
 import StatusContainer from "@/components/StatusContainer";
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions } from "vuex";
 export default {
   components: {
     StatusContainer,
@@ -29,24 +29,31 @@ export default {
   data() {
     return {
       status: null,
-        filter:'',
+      filter: ""
     };
   },
-  created(){
-    this.fetchOrders()
-  },
   computed: {
-    ...mapGetters(['orders']),
     fiteredOrders() {
       return this.orders.filter(e => {
         if (this.status && this.status !== e.status._id) return false;
-        if (this.filter) return e.user.name.toUpperCase().indexOf(this.filter.toUpperCase())>=0
+        if (this.filter)
+          return (
+            e.user.name.toUpperCase().indexOf(this.filter.toUpperCase()) >= 0
+          );
         return true;
       });
     }
   },
-  methods:{
-    ...mapActions(['fetchOrders']),
+  asyncComputed: {
+    orders: {
+      get() {
+        return this.fetchOrders();
+      },
+      default: []
+    }
+  },
+  methods: {
+    ...mapActions(["fetchOrders", "getOrders"])
   }
 };
 </script>

@@ -1,5 +1,4 @@
 import axios from "axios"
-
 class HttpError extends Error {
     constructor(msg, error) {
         super(msg)
@@ -30,7 +29,7 @@ class HttpError extends Error {
  *      actions:
  *          fetchOrders: 
  */
-export default ({ name, url, headers,modifiedRequest,isArray }, objectName) => {
+export default ({ name, url, headers, modifiedRequest, isArray }, objectName) => {
     if (name === undefined) throw new Error('Name is required')
     if (url === undefined) throw new Error('URL is required')
     let isArrayInternal = isArray === false ? false : true
@@ -42,47 +41,76 @@ export default ({ name, url, headers,modifiedRequest,isArray }, objectName) => {
     const RECEIVE = 'RECEIVE_' + nameUpperCase
     const INVALIDATE = 'INVALIDATE_' + nameUpperCase
     const ERROR = 'ERROR_' + nameUpperCase
-    return {
-        state: {
-            [nameLowerCase]: null,
+    /**
+     *      result: null,
             isFetching: false,
             invalidate: true
+     */
+    return {
+        state: {
+            requests: {}
         },
         getters: {
-            [nameLowerCase]: store => store[nameLowerCase] === null && isArrayInternal ? []: store[nameLowerCase],
+            [nameLowerCase]: (state, queryString = '') => state[queryString] && state[queryString].result !== null ? state[queryString].result : isArrayInternal ? [] : null
         },
         actions: {
-            ['fetch' + nameFirstUp]({ commit, state }) {
-                if (!state.invalidate) return
-                commit(FETCH)
-                axios.get(url, {
+            ['fetch' + nameFirstUp]({ commit, state }, queryString = '') {
+                if (state.requests[queryString] === undefined)
+                    state.requests = Object.assign({}, state.requests, {
+                        [queryString]: {
+                            result: null,
+                            isFetching: false,
+                            invalidate: true
+                        }
+                    })
+                if (!state.requests[queryString].invalidate) return state.requests[queryString].result
+                commit(FETCH, { queryString })
+                return axios.get(url + `?${queryString}`, {
                     headers
                 }).then(response => {
                     if (response.status === 200) {
                         const result = modifiedRequest ? modifiedRequest(response.data) : response.data
-                        return commit(RECEIVE, result)
+                        commit(RECEIVE, { queryString, result })
+                        return result
                     }
-
-                    return commit(ERROR, new HttpError(response.data, response.status))
+                    let err = new HttpError(response.data, response.status)
+                    commit(ERROR, { queryString, err })
+                    return Promise.reject(err)
                 })
             }
         },
         mutations: {
-            [FETCH](state) {
-                state.isFetching = true
-                state.invalidate = false
+            [FETCH](state, { queryString }) {
+                if (state.requests[queryString] === undefined)
+                    state.requests = Object.assign({}, state.requests, {
+                        [queryString]: {
+                            result: null,
+                            isFetching: false,
+                            invalidate: true
+                        }
+                    })
+                state.requests[queryString].isFetching = true
+                state.requests[queryString].invalidate = false
             },
-            [RECEIVE](state, data) {
-                state.isFetching = false
-                state[nameLowerCase] = data
+            [RECEIVE](state, { queryString, result }) {
+                state.requests[queryString].isFetching = false
+                state.requests[queryString].result = result
             },
-            [INVALIDATE](state) {
-                state.isFetching = false
-                state.invalidate = true
+            [INVALIDATE](state, { queryString }) {
+                if (state.requests[queryString] === undefined)
+                    state.requests = Object.assign({}, state.requests, {
+                        [queryString]: {
+                            result: null,
+                            isFetching: false,
+                            invalidate: true
+                        }
+                    })
+                state.requests[queryString].isFetching = false
+                state.requests[queryString].invalidate = true
             },
-            [ERROR](state, error) {
-                state.error = error
-                state.isFetching = false
+            [ERROR](state, { queryString, error }) {
+                state.requests[queryString].error = error
+                state.requests[queryString].isFetching = false
             }
 
         }
