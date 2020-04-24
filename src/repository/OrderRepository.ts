@@ -8,14 +8,33 @@ export function getOrderByUser(userId: Types.ObjectId, callback: Callback<OrderT
         $match: {
             user: new Types.ObjectId(userId)
         }
-    }, {
+    },
+    {
         $lookup: {
             from: ModelsNames.STATUS,
             localField: 'status',
             foreignField: '_id',
             as: 'status'
         }
-    }, {
+    },
+    {
+        $lookup:{
+            from: ModelsNames.USER,
+            localField: 'user',
+            foreignField: '_id',
+            as: 'user'
+        }
+    },
+    {
+        $unwind: '$status'
+    },
+    {
+        $unwind: '$user'
+    },
+    {
+        $project: {"user.password":0}
+    },
+    {
         $unwind: '$files'
     },
     {
@@ -31,12 +50,13 @@ export function getOrderByUser(userId: Types.ObjectId, callback: Callback<OrderT
     },
     {
         $group: {
-            _id: '_id',
+            _id: '$_id',
             files: { $push: '$files' },
             price: { $last: '$price' },
             status: { $last: '$status' },
             date: { $last: '$date' },
-            user: { $last: '$user' }
+            user: { $last: '$user' },
+            closed: { $last: '$closed' },
         }
     }], callback)
 }
@@ -106,12 +126,13 @@ export function getOrderFiltered(options: Partial<Options>, pagesOptions: { page
         },
         {
             $group: {
-                _id: '_id',
+                _id: '$_id',
                 files: { $push: '$files' },
                 price: { $last: '$price' },
                 status: { $last: '$status' },
                 date: { $last: '$date' },
-                user: { $last: '$user' }
+                user: { $last: '$user' },
+                closed: { $last: '$closed' },
             }
         }]), callback)
 }

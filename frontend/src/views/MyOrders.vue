@@ -9,7 +9,7 @@
         </v-toolbar>
       </v-row>
       <v-divider class="mx-4" vertical></v-divider>
-      <v-row>
+      <v-row v-if="!loading">
         <v-col v-for="order in fiteredOrders" v-bind:key="order._id">
           <Order readonly v-bind="order" />
         </v-col>
@@ -20,7 +20,7 @@
 <script>
 import Order from "@/components/Order";
 import StatusContainer from "@/components/StatusContainer";
-import { mapActions } from "vuex";
+import { mapGetters } from "vuex";
 export default {
   components: {
     StatusContainer,
@@ -29,10 +29,14 @@ export default {
   data() {
     return {
       status: null,
-      filter: ""
+      filter: "",
     };
   },
+  mounted() {
+    this.$store.dispatch('order/fetch')
+  },
   computed: {
+    ...mapGetters({getOrders:'order/get',isFetchingOrders:'order/isFetching'}),
     fiteredOrders() {
       return this.orders.filter(e => {
         if (this.status && this.status !== e.status._id) return false;
@@ -42,18 +46,13 @@ export default {
           );
         return true;
       });
+    },
+    loading(){
+      return this.isFetchingOrders()
+    },
+    orders(){
+      return this.getOrders()
     }
-  },
-  asyncComputed: {
-    orders: {
-      get() {
-        return this.fetchOrders();
-      },
-      default: []
-    }
-  },
-  methods: {
-    ...mapActions(["fetchOrders", "getOrders"])
   }
 };
 </script>

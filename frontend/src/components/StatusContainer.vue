@@ -8,7 +8,7 @@
   </v-item-group>
 </template>
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, } from 'vuex'
 export default {
     props:['value','defaultValue','madatory'],
     data(){
@@ -16,13 +16,13 @@ export default {
         }
     },
     created(){
-      this.fetchStatus()
+      this.$store.dispatch('status/fetch')
     },
     computed:{
-      ...mapGetters(['status'])
-    },
-    methods:{
-      ...mapActions(['fetchStatus'])
+      ...mapGetters({getStatus:'status/get'}),
+      status(){
+        return this.getStatus()
+      }
     }
 }
 </script>

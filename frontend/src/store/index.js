@@ -11,9 +11,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     plugins: [createLogger()],
     modules: {
-        config: generateApiStore({ name: 'CONFIG', url: '/api/rest/config', modifiedRequest: data => data.results[0] }, 'config'),
+        config: generateApiStore({ name: 'CONFIG', url: '/api/rest/config', modifiedRequest: data => data.results[0] }),
         login,
-        status: generateApiStore({ name: 'STATUS', url: '/api/rest/status', modifiedRequest: data => data.results, isArray: true }, 'status'),
-        orders: generateApiStore({ name: 'STATUS', url: '/api/order', modifiedRequest: data => data, isArray: true }, 'orders'),
+        status: generateApiStore({ name: 'STATUS', url: '/api/rest/status', modifiedRequest: data => data.results, isArray: true }),
+        order: generateApiStore({ name: 'ORDER', url: '/api/order', isArray: true }),
     }
 })

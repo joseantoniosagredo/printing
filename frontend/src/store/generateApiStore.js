@@ -29,32 +29,27 @@ class HttpError extends Error {
  *      actions:
  *          fetchOrders: 
  */
-export default ({ name, url, headers, modifiedRequest, isArray }, objectName) => {
+export default ({ name, url, headers, modifiedRequest, isArray, fetchAlways }) => {
     if (name === undefined) throw new Error('Name is required')
     if (url === undefined) throw new Error('URL is required')
-    let isArrayInternal = isArray === false ? false : true
-    const nameUpperCase = name.toUpperCase()
-    const nameLowerCase = objectName || name.toLowerCase()
-    const nameFirstUp = nameLowerCase.charAt(0).toUpperCase() + nameLowerCase.slice(1);
+    let isArrayInternal = isArray !== true ? false : true
+    
+    const FETCH = 'FETCH_' + name
+    const RECEIVE = 'RECEIVE_' + name
+    const INVALIDATE = 'INVALIDATE_' + name
+    const ERROR = 'ERROR_' + name
 
-    const FETCH = 'FETCH_' + nameUpperCase
-    const RECEIVE = 'RECEIVE_' + nameUpperCase
-    const INVALIDATE = 'INVALIDATE_' + nameUpperCase
-    const ERROR = 'ERROR_' + nameUpperCase
-    /**
-     *      result: null,
-            isFetching: false,
-            invalidate: true
-     */
     return {
+        namespaced: true,
         state: {
             requests: {}
         },
         getters: {
-            [nameLowerCase]: (state, queryString = '') => state[queryString] && state[queryString].result !== null ? state[queryString].result : isArrayInternal ? [] : null
+            get: (state) => (queryString = '') => state.requests[queryString] && state.requests[queryString].result !== null ? state.requests[queryString].result : isArrayInternal ? [] : null,
+            isFetching: state => (queryString = '') => state.requests[queryString] ? state.requests[queryString].fetching : false
         },
         actions: {
-            ['fetch' + nameFirstUp]({ commit, state }, queryString = '') {
+            fetch({ commit, state }, queryString = '') {
                 if (state.requests[queryString] === undefined)
                     state.requests = Object.assign({}, state.requests, {
                         [queryString]: {
@@ -63,7 +58,7 @@ export default ({ name, url, headers, modifiedRequest, isArray }, objectName) =>
                             invalidate: true
                         }
                     })
-                if (!state.requests[queryString].invalidate) return state.requests[queryString].result
+                if (!fetchAlways && !state.requests[queryString].invalidate) return state.requests[queryString].result
                 commit(FETCH, { queryString })
                 return axios.get(url + `?${queryString}`, {
                     headers
@@ -74,6 +69,9 @@ export default ({ name, url, headers, modifiedRequest, isArray }, objectName) =>
                         return result
                     }
                     let err = new HttpError(response.data, response.status)
+                    commit(ERROR, { queryString, err })
+                    return Promise.reject(err)
+                }).catch(err => {
                     commit(ERROR, { queryString, err })
                     return Promise.reject(err)
                 })
