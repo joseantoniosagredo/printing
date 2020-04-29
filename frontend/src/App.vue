@@ -74,7 +74,7 @@ export default {
     routers(){
       if(!this.getUser) return []
       if(this.getUser && this.getUser.admin) return routes
-      return routes.filter(r => !r.admin)
+      return routes.filter(r => !r.meta.admin)
     }
   },
   methods: {

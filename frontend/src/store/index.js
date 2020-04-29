@@ -15,5 +15,6 @@ export default new Vuex.Store({
         login,
         status: generateApiStore({ name: 'STATUS', url: '/api/rest/status', modifiedRequest: data => data.results, isArray: true }),
         order: generateApiStore({ name: 'ORDER', url: '/api/order', isArray: true }),
+        adminOrder: generateApiStore({ name: 'adminOrder', url: '/api/admin/order'}),
     }
 })

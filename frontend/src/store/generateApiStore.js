@@ -33,7 +33,7 @@ export default ({ name, url, headers, modifiedRequest, isArray, fetchAlways }) =
     if (name === undefined) throw new Error('Name is required')
     if (url === undefined) throw new Error('URL is required')
     let isArrayInternal = isArray !== true ? false : true
-    
+
     const FETCH = 'FETCH_' + name
     const RECEIVE = 'RECEIVE_' + name
     const INVALIDATE = 'INVALIDATE_' + name
@@ -75,6 +75,13 @@ export default ({ name, url, headers, modifiedRequest, isArray, fetchAlways }) =
                     commit(ERROR, { queryString, err })
                     return Promise.reject(err)
                 })
+            },
+            invalidate({ commit }, queryString = '') {
+                commit(INVALIDATE, { queryString })
+            },
+            invalidateAll({ commit, state }) {
+                let querystring = Object.keys(state.requests)
+                querystring.forEach(qs => commit(INVALIDATE, { queryString: qs }))
             }
         },
         mutations: {

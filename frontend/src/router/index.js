@@ -1,51 +1,63 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import state from '@/store/login'
+import state from '@/store'
 Vue.use(VueRouter)
 
 export const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home,
-    admin:false
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
-    admin:false
-  },
-  {
+  /*{
     path: '/order',
     name: 'Order',
     component: () => import('../views/OrdersView.vue'),
-    beforeEnter:(to, from, next) =>{
+    beforeEnter: (to, from, next) => {
       if (state.getters.getUser && state.getters.getUser.admin)
         console.log('Autorizado')
       else
         console.log('NO Autorizado')
       next(true)
     },
-    admin:true
+    meta: {
+      admin: true
+    }
+  },*/
+  
+  {
+
+    path: '/',
+    name: 'My Orders',
+    component: () => import('../views/MyOrders.vue'),
+    meta: {
+      admin: false
+    }
   },
   {
-    
+
     path: '/new',
     name: 'New Order',
     component: () => import('../views/NewOrder.vue'),
-    admin:false
+    meta: {
+      admin: false
+    }
   },
   {
-    
-    path: '/profile/orders',
-    name: 'My Orders',
-    component: () => import('../views/MyOrders.vue'),
-    admin:false
+
+    path: '/admin/order',
+    name: 'All Orders',
+    component: () => import('../views/AllOrderAdmin.vue'),
+    beforeEnter: (to, from, next) => {
+      console.log(state)
+      if (state.getters.getUser && state.getters.getUser.admin){
+        console.log('Autorizado')
+        next(true)
+      }
+      else{
+        console.log('NO Autorizado')
+        next(false)
+      }
+      
+    },
+    meta: {
+      admin: true
+    }
   }
 ]
 
@@ -54,7 +66,8 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
-router.afterEach((to)=>{
+router.afterEach((to) => {
   window.document.title = 'IV: ' + to.name
 })
+
 export default router

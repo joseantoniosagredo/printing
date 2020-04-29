@@ -38,14 +38,14 @@
                   :group.sync="file.group"
                   :copies.sync="file.copies"
                   :bind.sync="file.bind"
-                  :dobleSided.sync="file.dobleSided"
+                  :doubleSided.sync="file.doubleSided"
                   :color.sync="file.color"
                   :pages="file.pages"
                 />
               </v-list-item-content>
             </v-list-item>
             <v-card-actions>
-              <v-btn @click="submitOrder">Submit</v-btn>
+              <v-btn @click="submitOrder">Submit : {{price}}€</v-btn>
               <v-btn text>Button</v-btn>
             </v-card-actions>
           </form>
@@ -75,6 +75,7 @@
 import InputCustom from "@/components/InputCustom";
 import FilesTable from "@/components/FilesTable";
 import FileCard from "@/components/FileCard";
+import {calculatePrice} from '@/utils'
 import { pageOf, postOrder } from "@/Api";
 import { mapGetters, mapActions } from "vuex";
 var id = 1
@@ -99,10 +100,16 @@ export default {
     };
   },
   created() {
-    this.fetchConfig();
+    this.$store.dispatch('config/fetch');
   },
   computed: {
-    ...mapGetters(["config", "getUser"])
+    ...mapGetters({getConfig:"config/get", getUser:"getUser"}),
+    config(){
+      return this.getConfig()
+    },
+    price(){
+      return calculatePrice(this.selected,this.config).toFixed(2)
+    }
   },
   watch: {
     config() {
@@ -113,7 +120,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["fetchConfig"]),
+    ...mapActions({invalidateOrders:'order/invalidateAll'}),
     submitOrder() {
       console.log("SUBMIT");
       let options = {};
@@ -132,7 +139,11 @@ export default {
         
       //THere are no problem because all file ended in .pdf
       this.selected.forEach(f => data.append(f.id, f.file));
-      postOrder(data, () => {});
+      postOrder(data, () => {
+        this.invalidateOrders()
+        this.$router.push({ name: 'My Orders' });
+
+      });
     },
     onSubmitFiles() {
       const data = new FormData();
@@ -141,7 +152,7 @@ export default {
         if (err) console.error(err);
         this.selected = this.files.filter(f =>data[f.name]!==undefined ).map(f => ({
           file: f,
-          dobleSided: false,
+          doubleSided: false,
           group: 1,
           bind: false,
           copies: 1,

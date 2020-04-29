@@ -18,7 +18,7 @@ export function getOrderByUser(userId: Types.ObjectId, callback: Callback<OrderT
         }
     },
     {
-        $lookup:{
+        $lookup: {
             from: ModelsNames.USER,
             localField: 'user',
             foreignField: '_id',
@@ -32,7 +32,7 @@ export function getOrderByUser(userId: Types.ObjectId, callback: Callback<OrderT
         $unwind: '$user'
     },
     {
-        $project: {"user.password":0}
+        $project: { "user.password": 0 }
     },
     {
         $unwind: '$files'
@@ -66,19 +66,19 @@ type Options = {
 }
 export function getOrderFiltered(options: Partial<Options>, pagesOptions: { page: number, pageSize: number }, callback: Callback<any>) {
     console.log(options)
-    const match: any[] = options.status ? [{
+    const matchStatus: any[] = options.status ? [{
         $match: {
             status: new Types.ObjectId(options.status)
         }
     }] : []
-    const matchUser:any[] = options.user ? [{
-        $match:{
-            'user.name':{$regex:options.user, $options:'i'}
+    const matchUser: any[] = options.user ? [{
+        $match: {
+            'user.name': { $regex: options.user, $options: 'i' }
         }
     }] : []
-    Order.aggregate(match.concat([
+    const match = matchStatus.concat([
         {
-            $lookup:{
+            $lookup: {
                 from: ModelsNames.USER,
                 localField: 'user',
                 foreignField: '_id',
@@ -86,53 +86,70 @@ export function getOrderFiltered(options: Partial<Options>, pagesOptions: { page
             }
         },
         ...matchUser
-        ,
+    ])
+    Order.aggregate(match.concat([
         {
-            $skip: (pagesOptions.page - 1) * pagesOptions.pageSize
-        },
-        {
-            $limit: pagesOptions.pageSize
-        },
-        {
-            $lookup: {
-                from: ModelsNames.STATUS,
-                localField: 'status',
-                foreignField: '_id',
-                as: 'status'
-            }
-        },
-        {
-            $unwind: '$status'
-        },
-        {
-            $unwind: '$user'
-        },
-        {
-            $project: {"user.password":0}
-        },
-        {
-            $unwind: '$files'
-        },
-        {
-            $lookup: {
-                from: ModelsNames.FILE,
-                localField,
-                foreignField: '_id',
-                as: localField
-            }
-        },
-        {
-            $unwind: '$files.file'
-        },
-        {
-            $group: {
-                _id: '$_id',
-                files: { $push: '$files' },
-                price: { $last: '$price' },
-                status: { $last: '$status' },
-                date: { $last: '$date' },
-                user: { $last: '$user' },
-                closed: { $last: '$closed' },
-            }
-        }]), callback)
+            $count: 'count'
+        }]), (err, [count]) => {
+            if (err) return callback(err)
+            Order.aggregate(match.concat([
+                {
+                    $skip: (pagesOptions.page - 1) * pagesOptions.pageSize
+                },
+                {
+                    $limit: pagesOptions.pageSize
+                },
+                {
+                    $lookup: {
+                        from: ModelsNames.STATUS,
+                        localField: 'status',
+                        foreignField: '_id',
+                        as: 'status'
+                    }
+                },
+                {
+                    $unwind: '$status'
+                },
+                {
+                    $unwind: '$user'
+                },
+                {
+                    $project: { "user.password": 0 }
+                },
+                {
+                    $unwind: '$files'
+                },
+                {
+                    $lookup: {
+                        from: ModelsNames.FILE,
+                        localField,
+                        foreignField: '_id',
+                        as: localField
+                    }
+                },
+                {
+                    $unwind: '$files.file'
+                },
+                {
+                    $group: {
+                        _id: '$_id',
+                        files: { $push: '$files' },
+                        price: { $last: '$price' },
+                        status: { $last: '$status' },
+                        date: { $last: '$date' },
+                        user: { $last: '$user' },
+                        closed: { $last: '$closed' },
+                    }
+                }]), (err, data) => {
+                    if (err) return callback(err)
+                    return callback(null, {
+                        metadata: {
+                            ...count,
+                            page: pagesOptions.page,
+                            pageSize: pagesOptions.pageSize
+                        }, data
+                    })
+                })
+        })
+
 }

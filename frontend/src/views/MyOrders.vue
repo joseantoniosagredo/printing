@@ -8,23 +8,19 @@
           <StatusContainer :value="status" @input="(id)=>status=status===id?null:id" />
         </v-toolbar>
       </v-row>
-      <v-divider class="mx-4" vertical></v-divider>
-      <v-row v-if="!loading">
-        <v-col v-for="order in fiteredOrders" v-bind:key="order._id">
-          <Order readonly v-bind="order" />
-        </v-col>
-      </v-row>
+      <OrderTable :data="filteredOrder"/>
     </v-col>
   </v-container>
 </template>
 <script>
-import Order from "@/components/Order";
 import StatusContainer from "@/components/StatusContainer";
+import OrderTable from "@/components/OrderTable";
+
 import { mapGetters } from "vuex";
 export default {
   components: {
     StatusContainer,
-    Order
+    OrderTable,
   },
   data() {
     return {
@@ -37,7 +33,7 @@ export default {
   },
   computed: {
     ...mapGetters({getOrders:'order/get',isFetchingOrders:'order/isFetching'}),
-    fiteredOrders() {
+    filteredOrder() {
       return this.orders.filter(e => {
         if (this.status && this.status !== e.status._id) return false;
         if (this.filter)

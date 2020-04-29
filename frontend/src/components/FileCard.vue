@@ -7,7 +7,7 @@
             <div class="flex">
                 <v-checkbox label="Color?" v-model="computedColor"></v-checkbox>
                 <v-checkbox label="Binded?" v-model="computedBind"></v-checkbox>
-                <v-checkbox label = "Doble Sided?" v-model="computedDobleSided"></v-checkbox>
+                <v-checkbox label = "Doble Sided?" v-model="computedDuobleSided"></v-checkbox>
             </div>
             <div>
                 <label>Pages</label>
@@ -35,7 +35,7 @@ export default {
     props:{
         file:{ 
         },
-        dobleSided:{type:Boolean, required:true},
+        doubleSided:{type:Boolean, required:true},
         group:{type:Number, required:true},
         bind:{type:Boolean, required:true},
         copies:{type:Number, required:true},
@@ -68,12 +68,12 @@ export default {
                 this.$emit('update:color',value)
             }
         },
-        computedDobleSided:{
+        computedDuobleSided:{
             get(){
-                return this.dobleSided
+                return this.doubleSided
             },
             set(value){
-                this.$emit('update:dobleSided',value)
+                this.$emit('update:doubleSided',value)
             }
         },
         
@@ -86,7 +86,7 @@ export default {
             }
         },
         totalPages(){
-            return calculatePages(this.pages,this.group,this.dobleSided,this.copies)
+            return calculatePages(this.pages,this.group,this.doubleSided,this.copies)
         }
     }
 

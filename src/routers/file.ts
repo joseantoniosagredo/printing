@@ -1,4 +1,4 @@
-import { Router, Request } from 'express'
+import { Router, Request, Response } from 'express'
 import { Types } from 'mongoose';
 import { File } from '../models';
 import { FileType, FileDocumentType } from '../models/File'
@@ -9,9 +9,10 @@ import * as fs from 'fs'
 import Order, { OrderType, FileOrderType, FileOrderPopulatedType } from '../models/Order';
 import { getDefaultStatus } from '../repository/StatusRepository';
 import { calculatePrice } from '../repository/ConfigRepository';
+import { isAdmin } from '../controller/SecurityController';
 type File = upload.UploadedFile
 type Metadata = {
-    dobleSided: boolean,
+    doubleSided: boolean,
     group: number,
     bind: boolean,
     copies: number,
@@ -73,7 +74,7 @@ route.post('/order', (req: Request & { files: { [name: string]: File } }, res) =
                         return {
                             file: obj.file,
                             bind: meta.bind,
-                            doubleSided: meta.dobleSided,
+                            doubleSided: meta.doubleSided,
                             group: meta.group,
                             color: meta.color,
                             copies: meta.copies
@@ -117,6 +118,7 @@ route.post('/pagesof', (req: Request & { files: { [name: string]: File } }, res)
         res.send(result)
     })
 })
+route.get('/file/:id',isAdmin)
 route.get('/file/:id', (req, res) => {
     File.findById(req.params.id, (err, img) => {
         if (err) return res.status(500).send(err.message)
