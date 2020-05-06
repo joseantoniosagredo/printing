@@ -1,6 +1,4 @@
-import { User, Order } from '../models';
 import { Router } from 'express';
-import { Types } from 'mongoose';
 import { getOrderByUser } from '../repository/OrderRepository';
 const route = Router()
 
@@ -12,6 +10,5 @@ route.get('/order',(req,res)=>{
         res.send(orders)
     })
 })
-
 
 export default route

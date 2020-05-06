@@ -6,17 +6,17 @@
           <form @submit.prevent="submit">
             <v-list-item three-line>
               <v-list-item-content>
-                <div class="overline mb-4">Create new order</div>
+                <div class="overline mb-4">{{t("newOrder")}}</div>
                 <div class="flex">
                   <v-list-item-content>
-                    <v-list-item-title class="headline mb-1">Your information</v-list-item-title>
+                    <v-list-item-title class="headline mb-1">{{t("yourInformation")}}</v-list-item-title>
                     <!--<v-list-item-subtitle>Greyhound divisely hello coldly fonwderfully</v-list-item-subtitle>-->
                     <div>
-                      <label>Phone</label>
+                      <label>{{t("phone")}}</label>
                       <p>{{getUser.phone}}</p>
                     </div>
                     <div>
-                      <label>Email</label>
+                      <label>{{t("email")}}</label>
                       <p>{{getUser.email}}</p>
                     </div>
                   </v-list-item-content>
@@ -45,8 +45,7 @@
               </v-list-item-content>
             </v-list-item>
             <v-card-actions>
-              <v-btn @click="submitOrder">Submit : {{price}}€</v-btn>
-              <v-btn text>Button</v-btn>
+              <v-btn @click="submitOrder">{{t("submit")}} : {{price}}€</v-btn>
             </v-card-actions>
           </form>
         </v-card>
@@ -60,9 +59,9 @@
               v-model="files"
               chips
               multiple
-              label="File input"
+              :label="t('fileInput')"
             ></v-file-input>
-            <v-btn :disabled="files.length==0" type="submit">upload files</v-btn>
+            <v-btn :disabled="files.length==0" type="submit">{{t("upload")}}</v-btn>
           </form>
           <FilesTable :selected="selected" @delete="onRemoveFile" />
         </v-card>
@@ -122,14 +121,11 @@ export default {
   methods: {
     ...mapActions({invalidateOrders:'order/invalidateAll'}),
     submitOrder() {
-      console.log("SUBMIT");
       let options = {};
       if (this.config)
         Object.keys(this.config).forEach(key => {
           options[key] = this.values[key];
         });
-      console.log(options);
-      console.log(this.selected);
       const data = new FormData();
       
       data.append('metadata',JSON.stringify(this.selected.map(e => {

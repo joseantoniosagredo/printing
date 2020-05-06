@@ -1,5 +1,6 @@
-import { Router,Request } from 'express';
-import { getOrderFiltered } from '../repository/OrderRepository';
+import { Router } from 'express';
+import { getOrderFiltered, closeOrder, patchOrder } from '../repository/OrderRepository';
+import { Types } from 'mongoose';
 const route = Router()
 
 route.get('/order', (req, res) => {
@@ -17,6 +18,19 @@ route.get('/order', (req, res) => {
         res.send(data)
     })
 })
-
+route.get('/order/close/:id',(req,res)=>{
+    let id = new Types.ObjectId(req.params.id)
+    closeOrder(id,(err,order)=>{
+        if(err) return res.status(err.status).send(err.message)
+        res.send(order)
+    })
+})
+route.patch('/order/:id',(req,res)=>{
+    let id = Types.ObjectId(req.params.id)
+    patchOrder(id,req.body,(err,order)=>{
+        if (err) return res.status(500).send(err.message)
+        res.send(order)
+    })
+})
 
 export default route

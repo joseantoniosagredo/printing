@@ -4,10 +4,10 @@
       <v-col cols="12" sm="8" md="4">
         <v-card class="elevation-12" :disabled="loading">
           <v-toolbar color="primary" dark flat>
-            <v-toolbar-title>Login form</v-toolbar-title>
+            <v-toolbar-title>{{t("loginForm")}}</v-toolbar-title>
             <v-spacer/>
                <v-btn large target="_blank" @click="$emit('registration')">
-                  registration
+                  {{t("registration")}}
                   <v-icon right>mdi-code-tags</v-icon>
                 </v-btn>
            
@@ -16,7 +16,7 @@
             <v-card-text>
               <v-text-field
                 v-model="user"
-                label="Login"
+                :label="t('email')"
                 name="login"
                 prepend-icon="md-svg-account"
                 type="text"
@@ -25,7 +25,7 @@
               <v-text-field
                 v-model="password"
                 id="password"
-                label="Password"
+                :label="t('password')"
                 name="password"
                 prepend-icon="md-svg-lock"
                 type="password"
@@ -35,7 +35,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer/>
-              <v-btn type="submit" color="primary">Login</v-btn>
+              <v-btn type="submit" color="primary">{{t("login")}}</v-btn>
             </v-card-actions>
           </v-form>
         </v-card>

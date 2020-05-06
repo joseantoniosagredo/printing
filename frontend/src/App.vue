@@ -25,7 +25,7 @@
         />
         <div  class='link'>
           <router-link v-for="(router,index) in routers" :key="index" :to="router.path" v-slot="{ href, route, navigate, isExactActive ,}">
-            <v-btn :color="isExactActive  ? 'secondary':'primary'" @click="navigate">{{route.name}}</v-btn>
+            <v-btn :color="isExactActive  ? 'secondary':'primary'" @click="navigate">{{t(route.name)}}</v-btn>
           </router-link>
         </div>
       </div>
@@ -33,13 +33,28 @@
       <v-spacer></v-spacer>
 
       <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
+        v-if="getUser"
         text
       >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
+        <span class="mr-2">{{getUser.name}}</span>
+        <v-icon>mdi-account</v-icon>
       </v-btn>
+      <v-menu :close-on-content-click="true">
+        <template v-slot:activator="{on}">
+      <v-btn icon v-on="on">
+         <v-icon>mdi-web</v-icon>
+      </v-btn>
+        </template>
+         <v-list>
+        <v-list-item
+          v-for="(item, index) in items"
+          :key="index"
+          @click="()=>setLanguage(item.lang)"
+        >
+          <v-list-item-title>{{ item.title }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+      </v-menu>
     </v-app-bar>
     <v-content v-if="init">
       <Login v-if="!getUser"/>
@@ -63,7 +78,11 @@ export default {
   },
   data(){
     return {
-      transitionName:'right-to-left'
+      transitionName:'right-to-left',
+      items: [
+        { title: 'Español', lang:'es' },
+        { title: 'English', lang:'en' },
+      ],
     }
   },
   created(){
@@ -78,7 +97,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['session'])
+    ...mapActions(['session','setLanguage'])
   },
   watch:{
     '$route'(to,from){

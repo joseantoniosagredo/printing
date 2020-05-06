@@ -8,6 +8,7 @@ import mongoose from './models'
 import * as session from 'express-session'
 import { SessionOptions } from 'express-session'
 import * as bodyParse from 'body-parser'
+
 var path = require('path')
 const app = express()
 const MongoStore = require('connect-mongo')(session);

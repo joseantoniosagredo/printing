@@ -1,7 +1,12 @@
 import { Types } from "mongoose";
-import { Callback } from "../utils";
+import HttpError, { Callback } from "../utils";
 import Order, { OrderType } from "../models/Order";
 import { ModelsNames } from '../models/enums'
+import { File } from "../models";
+import {getFinalStatus} from './StatusRepository'
+import * as fs from 'fs'
+import * as Q from 'q'
+
 let localField = 'files.file'
 export function getOrderByUser(userId: Types.ObjectId, callback: Callback<OrderType[]>) {
     Order.aggregate([{
@@ -152,4 +157,36 @@ export function getOrderFiltered(options: Partial<Options>, pagesOptions: { page
                 })
         })
 
+}
+
+export function patchOrder(_id:Types.ObjectId,patch:Partial<OrderType>,callback:Callback<OrderType>){
+    Order.update({_id:new Types.ObjectId(_id)},{$set:patch},callback)
+}
+export function closeOrder(_id:Types.ObjectId,callback:Callback<OrderType,HttpError>){
+    getFinalStatus((err,status)=>{
+        if(err) return callback(new HttpError(err))
+        if(!status) return callback(new HttpError('Status not found',501))
+        Order.findById(_id,(err,order)=>{
+            if(err) return callback(err)
+            const files = order.files.map(e => e.file)
+            Q.all(files.map(fileId => Q.Promise((resolve,reject)=>{
+                File.findById(fileId,(err,file)=>{
+                    if(err) return reject(err)
+                    fs.unlink(file.destination,err => {
+                        if(err) return reject(err)
+                        file.deleted = true
+                        file.save(err => {
+                            if(err) return reject(err)
+                            resolve()    
+                        })
+                    })
+                })
+            }))).then(()=>{
+                order.closed = true
+                order.status = status._id
+                order.save(callback)
+            }).catch(err => callback(new HttpError(err)))
+        })
+    })
+    
 }

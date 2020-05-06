@@ -4,10 +4,10 @@
       <v-col cols="12" sm="8" md="4">
         <v-card class="elevation-12" :disabled="loading">
           <v-toolbar color="primary" dark flat>
-            <v-toolbar-title>Registration form</v-toolbar-title>
+            <v-toolbar-title>{{t("registrationForm")}}</v-toolbar-title>
             <v-spacer/>
                 <v-btn :href="source" large target="_blank" @click="$emit('login')">
-                  Login
+                  {{t("login")}}
                   <v-icon right>mdi-code-tags</v-icon>
                 </v-btn>
             
@@ -16,14 +16,14 @@
             <v-card-text>
               <v-text-field
                 v-model="name"
-                label="Name"
+                :label="t('name')"
                 name="name"
                 prepend-icon="md-svg-account"
                 type="text"
               />
                 <v-text-field
                 v-model="email"
-                label="Email"
+                :label="t('email')"
                 name="email"
                 prepend-icon="md-svg-account"
                 type="email"
@@ -31,7 +31,7 @@
                <v-text-field
                 v-model="phone"
                 id="phone"
-                label="Phone"
+                :label="t('phone')"
                 name="phone"
                 prepend-icon="md-svg-phone"
                 type="number"
@@ -39,7 +39,7 @@
               />
               <v-text-field
                 v-model="password"
-                label="Password"
+                :label="t('password')"
                 name="password"
                 prepend-icon="md-svg-lock"
                 type="password"
@@ -47,7 +47,7 @@
               <v-text-field
                 v-model="repeatePassword"
                 id="password"
-                label="Password"
+                :label="t('repeatePassword')"
                 name="password"
                 prepend-icon="md-svg-lock"
                 type="password"
@@ -58,7 +58,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer/>
-              <v-btn type="submit" color="primary">Create new user</v-btn>
+              <v-btn type="submit" color="primary"> {{t("newUser")}}</v-btn>
             </v-card-actions>
           </v-form>
         </v-card>

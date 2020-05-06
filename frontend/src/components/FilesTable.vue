@@ -30,16 +30,16 @@ export default {
     data(){
         return {
             headers:[{
-                text: 'File Name',
+                text: this.t('fileName'),
                 align: 'start',
                 value: 'name',
             },
             {
-                text: 'Pages',
+                text: this.t('pages'),
                 align: 'start',
                 value: 'pages',
             },{
-                text:'',
+                text: '',
                 align: 'start',
                 value: 'remove',
             }],

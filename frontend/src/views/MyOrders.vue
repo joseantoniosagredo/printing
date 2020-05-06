@@ -3,7 +3,7 @@
     <v-col cols="12">
       <v-row>
         <v-toolbar dense>
-          <v-toolbar-title>Filters</v-toolbar-title>
+          <v-toolbar-title>{{t("filters")}}</v-toolbar-title>
           <v-text-field label="Name" v-model="filter" />
           <StatusContainer :value="status" @input="(id)=>status=status===id?null:id" />
         </v-toolbar>

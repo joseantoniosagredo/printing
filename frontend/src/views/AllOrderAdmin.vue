@@ -1,6 +1,6 @@
 <template>
   <div>
-    <OrderTable editable :data="orders" :options.sync="options" @delete="handleDelete">
+    <OrderTable editable :data="orders" :options.sync="options" @delete="handleDelete" @status="handleStatus">
       <template v-slot:top>
         <v-toolbar dense>
           <v-toolbar-title>Filters</v-toolbar-title>
@@ -15,7 +15,8 @@
 <script>
 import OrderTable from "@/components/OrderTable.vue";
 import StatusContainer from "@/components/StatusContainer.vue";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
+import { closeOrder,patchOrder } from '@/Api';
 export default {
   components: {
     OrderTable,
@@ -66,8 +67,18 @@ export default {
     }
   },
   methods: {
+    ...mapActions({invalidateOrder:'adminOrder/invalidateAll'}),
     handleDelete(id){
-      console.log(id)
+      closeOrder(id,err=>{
+        if(err) return console.error(err)
+        this.invalidateOrder()
+      })
+    },
+    handleStatus({orderId,id}){
+      patchOrder(orderId,{status:id},(err)=>{
+        if(err) return console.error(err)
+        this.invalidateOrder()
+      })
     }
   },
   watch: {

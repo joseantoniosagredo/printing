@@ -45,7 +45,10 @@ export default ({ name, url, headers, modifiedRequest, isArray, fetchAlways }) =
             requests: {}
         },
         getters: {
-            get: (state) => (queryString = '') => state.requests[queryString] && state.requests[queryString].result !== null ? state.requests[queryString].result : isArrayInternal ? [] : null,
+            get: (state) => (queryString = '') => {
+                if(state.requests[queryString]) state.requests[queryString].invalidate //watch if is invalidate
+                return state.requests[queryString] && state.requests[queryString].result !== null ? state.requests[queryString].result : isArrayInternal ? [] : null
+            },
             isFetching: state => (queryString = '') => state.requests[queryString] ? state.requests[queryString].fetching : false
         },
         actions: {

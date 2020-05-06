@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import state from '@/store'
+
 Vue.use(VueRouter)
 
 export const routes = [
@@ -23,7 +23,7 @@ export const routes = [
   {
 
     path: '/',
-    name: 'My Orders',
+    name: 'myOrders',
     component: () => import('../views/MyOrders.vue'),
     meta: {
       admin: false
@@ -32,7 +32,7 @@ export const routes = [
   {
 
     path: '/new',
-    name: 'New Order',
+    name: 'newOrder',
     component: () => import('../views/NewOrder.vue'),
     meta: {
       admin: false
@@ -41,20 +41,8 @@ export const routes = [
   {
 
     path: '/admin/order',
-    name: 'All Orders',
+    name: 'allOrders',
     component: () => import('../views/AllOrderAdmin.vue'),
-    beforeEnter: (to, from, next) => {
-      console.log(state)
-      if (state.getters.getUser && state.getters.getUser.admin){
-        console.log('Autorizado')
-        next(true)
-      }
-      else{
-        console.log('NO Autorizado')
-        next(false)
-      }
-      
-    },
     meta: {
       admin: true
     }

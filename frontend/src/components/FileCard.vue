@@ -2,15 +2,15 @@
     <v-card class="card">
         <v-card-title>{{file.name}}</v-card-title>
         <v-card-text>
-            <InputCustom :type="[1,2,4]" label='Group' v-model="computedGroup" />
-            <InputCustom type="number" label='Copies' v-model="computedCopies" />
+            <InputCustom :type="[1,2,4]" :label='t("group")' v-model="computedGroup" />
+            <InputCustom type="number" :label='t("copies")' v-model="computedCopies" />
             <div class="flex">
-                <v-checkbox label="Color?" v-model="computedColor"></v-checkbox>
-                <v-checkbox label="Binded?" v-model="computedBind"></v-checkbox>
-                <v-checkbox label = "Doble Sided?" v-model="computedDuobleSided"></v-checkbox>
+                <v-checkbox :label="t('color') + '?'" v-model="computedColor"></v-checkbox>
+                <v-checkbox :label="t('binded') + '?'" v-model="computedBind"></v-checkbox>
+                <v-checkbox :label ="t('doubleSide') + '?'" v-model="computedDuobleSided"></v-checkbox>
             </div>
             <div>
-                <label>Pages</label>
+                <label>{{t("pages")}}</label>
                 <p>{{totalPages}}</p>
             </div>
         </v-card-text>

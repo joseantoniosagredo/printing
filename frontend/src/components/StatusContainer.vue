@@ -1,7 +1,7 @@
 <template>
     <v-item-group :mandatory="madatory" :value="value">
         <v-item  v-for="e in status" :key='e._id' :value="e._id" v-slot:default="{ active}">
-              <v-btn :class="{default:defaultValue===e._id}" @click="()=>{$emit('input',e._id)}" :color="active ? 'primary':''">{{e.name}}</v-btn>
+              <v-btn :disabled="disabled" @click="()=>{$emit('input',e._id)}" :color="active ? 'primary':''">{{e.name}}</v-btn>
            
           </v-item>
       
@@ -10,13 +10,14 @@
 <script>
 import { mapGetters, } from 'vuex'
 export default {
-    props:['value','defaultValue','madatory'],
+    props:['value','defaultValue','madatory','disabled'],
     data(){
         return {
         }
     },
     created(){
       this.$store.dispatch('status/fetch')
+      console.log(this.value)
     },
     computed:{
       ...mapGetters({getStatus:'status/get'}),

@@ -9,13 +9,13 @@
         <table>
           <tr>
             <td>
-              <label>Phone</label>
+              <label>{{t("phone")}}</label>
             </td>
             <td>{{user.phone}}</td>
           </tr>
           <tr>
             <td>
-              <label>Email</label>
+              <label>{{t("email")}}</label>
             </td>
             <td>{{user.email}}</td>
           </tr>
@@ -40,16 +40,16 @@
               <a target="_blank" :href="fileObj.file.path">{{fileObj.file.originalName}}</a>
             </td>
             <td>
-              {{fileObj.color ? 'YES': 'NO'}}
+              {{fileObj.color ? t('Yes'): t('No')}}
             </td>
             <td>
-              {{fileObj.bind ? 'YES': 'NO'}}
+              {{fileObj.bind ?  t('Yes'): t('No')}}
             </td>
             <td>
               {{fileObj.copies}}
             </td>
             <td>
-              {{fileObj.doubleSided ? 'YES': 'NO'}}
+              {{fileObj.doubleSided ?  t('Yes'): t('No')}}
             </td>
           </tr>
         </table>
