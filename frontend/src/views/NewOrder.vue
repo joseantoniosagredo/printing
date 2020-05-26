@@ -40,6 +40,7 @@
                   :bind.sync="file.bind"
                   :doubleSided.sync="file.doubleSided"
                   :color.sync="file.color"
+                  :stapled.sync="file.stapled"
                   :pages="file.pages"
                 />
               </v-list-item-content>
@@ -91,9 +92,9 @@ export default {
       files: [],
       rules: [
         files => {
-          return files.every(file => file.name.endsWith(".pdf"))
+          return files.every(file => file.name.endsWith(".pdf") || file.name.endsWith(".pptx") || file.name.endsWith(".docx"))
             ? true
-            : "Files must be a PDF";
+            : "Files must be a PDF, PPTX or DOCX";
         }
       ]
     };
@@ -153,6 +154,7 @@ export default {
           bind: false,
           copies: 1,
           color: false,
+          stapled:false,
           id: id++,
           pages: parseInt(data[f.name])
         }));

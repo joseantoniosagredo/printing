@@ -1,0 +1,7 @@
+export const getMyOrdersPath = () => '/'
+export const getNewOrderPath = () => '/new'
+export const getAllOrdersPath = () => '/admin/order'
+export const getLoginPath = () => '/login'
+export const getVerifyUserPath = () => '/verify/user'
+export const getVerifyPasswordPath = () => '/user/password'
+export const getChangePasswordPath = () => '/user/password'

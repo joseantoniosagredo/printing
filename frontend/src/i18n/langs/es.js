@@ -15,7 +15,7 @@ export default {
     doubleSide:'Doble cara',
     group:'Paginas en una pagina',
     download:'Descargar',
-
+    stapled:'Grapado',
     //new Order
     yourInformation:'Tu información',
     submit:'Subir',

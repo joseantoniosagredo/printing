@@ -112,6 +112,7 @@ export default {
         { text: this.t("color"), value: "color" },
         { text: this.t("copies"), value: "copies" },
         { text: this.t("doubleSide"), value: "doubleSided" },
+        { text: this.t("stapled"), value: "stapled" },
         { text: this.t("group"), value: "group" }
       ].concat(this.editable ? [{ text: this.t("download"), value: "link" }] : [])
     };
@@ -134,7 +135,7 @@ export default {
           bind:f.bind ? this.t('yes'):this.t('no'),
           color:f.color ? this.t('yes'):this.t('no'),
           doubleSided:f.doubleSided ? this.t('yes'):this.t('no'),
-          group:f.group ? this.t('yes'):this.t('no')
+          stapled:f.stapled ? this.t('yes'):this.t('no')
 
         }))
       }));

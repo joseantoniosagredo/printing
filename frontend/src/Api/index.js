@@ -63,3 +63,33 @@ export function login(username, password, callback) {
         callback(new Error(response.statusText))
     }).catch(callback)
 }
+export function logout(callback) {
+    axios.get('/api/logout').then((response) => {
+        if (response.status === 200)
+            return callback(null)
+        callback(new Error(response.statusText))
+    }).catch(callback)
+}
+
+export function changePassword(user,token,password,callback) {
+    axios.post('/api/password/token',{user,token,password}).then((response) => {
+        if (response.status === 200)
+            return callback(null)
+        callback(new Error(response.statusText))
+    }).catch(callback)
+}
+export function resetPassword(user,callback) {
+    axios.post('/api/password/reset',{user}).then((response) => {
+        if (response.status === 200)
+            return callback(null)
+        callback(new Error(response.statusText))
+    }).catch(callback)
+}
+
+export function verifyUser(token,callback) {
+    axios.get('/api/register/token/'+token).then((response) => {
+        if (response.status === 200)
+            return callback(null)
+        callback(new Error(response.statusText))
+    }).catch(callback)
+}

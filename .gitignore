@@ -5,6 +5,7 @@ storage-config.json
 /dist
 cloud
 # local env files
+.env
 .env.local
 .env.*.local
 

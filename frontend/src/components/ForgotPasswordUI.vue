@@ -6,8 +6,8 @@
           <v-toolbar color="primary" dark flat>
             <v-toolbar-title>{{t("loginForm")}}</v-toolbar-title>
             <v-spacer/>
-               <v-btn large target="_blank" @click="$emit('registration')">
-                  {{t("registration")}}
+               <v-btn large target="_blank" @click="$emit('login')">
+                  {{t("back-to-login")}}
                   <v-icon right>mdi-code-tags</v-icon>
                 </v-btn>
            
@@ -21,22 +21,11 @@
                 prepend-icon="md-svg-account"
                 type="text"
               />
-
-              <v-text-field
-                v-model="password"
-                id="password"
-                :label="t('password')"
-                name="password"
-                prepend-icon="md-svg-lock"
-                type="password"
-                clearable
-              />
               <v-input v-if="error" error>{{error}}</v-input>
             </v-card-text>
             <v-card-actions>
-              <v-btn @click="$emit('forgotPassword')" color="secondary">{{t("forgot-your-password")}}</v-btn>
               <v-spacer/>
-              <v-btn type="submit" color="primary">{{t("login")}}</v-btn>
+              <v-btn type="submit" color="primary">{{t("change-password")}}</v-btn>
             </v-card-actions>
           </v-form>
         </v-card>
@@ -47,6 +36,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { resetPassword } from '../Api'
 export default {
   props: {
     source: String
@@ -67,15 +57,12 @@ export default {
   methods: {
     ...mapActions(["fetchUser"]),
     onSubmit() {
-      if (!this.user || !this.password)
+      if (!this.user )
         return (this.error = "Please complete all fields");
       this.error = "";
-      this.fetchUser({ username: this.user, password: this.password },(err,user) => {
-        if(!err){
-            if(user.admin) this.$router.redirect({name:'allOrders'})
-            else this.$router.redirect({name:'myOrder'})
-        } 
-      });
+      resetPassword(this.user,err => {
+        if(err) return this.error = 'ha habido algun error'
+      })
     }
   }
 };

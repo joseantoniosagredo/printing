@@ -4,30 +4,33 @@ import { File } from '../models';
 import { FileType, FileDocumentType } from '../models/File'
 import * as upload from 'express-fileupload'
 import * as pdf from 'pdf-parse'
-import { createFile } from '../cloud/google/storage';
 import * as fs from 'fs'
-import Order, { OrderType, FileOrderType, FileOrderPopulatedType } from '../models/Order';
+import Order, { OrderType, FileOrderPopulatedType } from '../models/Order';
 import { getDefaultStatus } from '../repository/StatusRepository';
 import { calculatePrice } from '../repository/ConfigRepository';
 import { isAdmin } from '../controller/SecurityController';
+import { getSlideNumber } from '../fileReaders/pttxReader';
+import HttpError from '../utils';
+import { getPagesNumber } from '../fileReaders/docxReader';
 type File = upload.UploadedFile
 type Metadata = {
     doubleSided: boolean,
     group: number,
     bind: boolean,
     copies: number,
+    stapled: boolean,
     color: boolean,
     id: number,
 }
 
 const route = Router()
-
-route.use(upload({
-    useTempFiles: false,
+let uploadMidleware: any = upload({
+    useTempFiles: true,
     tempFileDir: '/tmp',
     limits: { fileSize: 50 * 1024 * 1024 },
     //debug:true
-}))
+})
+route.use(uploadMidleware)
 //default path file insede 
 route.post('/order', (req: Request & { files: { [name: string]: File } }, res) => {
     let user = req.session.user
@@ -77,6 +80,7 @@ route.post('/order', (req: Request & { files: { [name: string]: File } }, res) =
                             doubleSided: meta.doubleSided,
                             group: meta.group,
                             color: meta.color,
+                            stapled:meta.stapled,
                             copies: meta.copies
                         }
                     else
@@ -109,14 +113,29 @@ route.post('/order', (req: Request & { files: { [name: string]: File } }, res) =
 route.post('/pagesof', (req: Request & { files: { [name: string]: File } }, res) => {
     console.log(req.files)
     Promise.all(Object.keys(req.files).map(name => new Promise((resolve, reject) => {
-        pdf(req.files[name].data).then(data => {
-            resolve({ name, pages: data.numpages })
-        }).catch(err => console.error(err))
+        switch(req.files[name].mimetype){
+            case 'application/pdf':
+                return pdf(req.files[name].data).then(data => {
+                    resolve({ name, pages: data.numpages })
+                }).catch(reject)
+            case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+                return getSlideNumber(req.files[name].tempFilePath).then(slides => {
+                    resolve({name, pages:slides})
+                    }).catch(reject)
+            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                console.log('ASLKDASJS')
+                return getPagesNumber(req.files[name].tempFilePath).then(number => {
+                    resolve({name, pages:number})
+                }).catch(reject)
+            default:
+                return reject(new HttpError('MimeTipe'+req.files[name].mimetype+' not found',400))
+        }
+        
     }))).then((data: { name: string, pages: number }[]) => {
         const result = {}
         data.forEach(d => result[d.name] = d.pages)
         res.send(result)
-    })
+    }).catch(err => res.send(500).send(err))
 })
 route.get('/file/:id',isAdmin)
 route.get('/file/:id', (req, res) => {

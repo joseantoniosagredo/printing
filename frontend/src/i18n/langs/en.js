@@ -15,7 +15,7 @@ export default {
     doubleSide:'Double-side',
     group:'Pages in one page',
     download:'Download',
-
+    stapled:'Stapled',
     //new Order
     yourInformation:'Your informations',
     submit:'Submit',

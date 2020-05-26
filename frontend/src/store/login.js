@@ -3,24 +3,33 @@ const FETCH = 'FETCH'
 const FETCH_SESSION = 'FETCH_SESSION'
 const ERROR_SESSION = 'ERROR_SESSION'
 const RECEIVE = 'RECEIVE'
+
+export const REMOVE = 'REMOVE_SESSION'
 import axios from 'axios'
 import { login } from '../Api'
-export default {
-    state:{
+function getInitState(){
+    return {
         user:null,
         init:false,
         isFetching:false
-    },
+    }
+}
+export default {
+    state:getInitState(),
     getters: {
         getUser: store => store.user,
         init: store => store.init
     },
     actions:{
-        fetchUser({commit},input){
+        fetchUser({commit},input,callback){
             commit(FETCH)
             login(input.username,input.password,(err,user)=>{
-                if(err) return commit(ERROR_SESSION,err)
+                if(err){
+                    if(callback) callback(err)
+                    return commit(ERROR_SESSION,err)
+                } 
                 commit(RECEIVE,user)
+                if(callback) callback(null,user)
             })
         },
         session({commit}){
@@ -48,6 +57,11 @@ export default {
             state.init = true
             
         },
+        [REMOVE](state){
+            state.user=null
+            state.init=true
+            state.isFetching=false
+        }
 
     }
 }

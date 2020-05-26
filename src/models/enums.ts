@@ -4,5 +4,6 @@ export enum ModelsNames {
     ORDER = 'order',
     FILE = 'file',
     STATUS = 'status',
-    CONFIG = 'config'
+    CONFIG = 'config',
+    TOKEN = 'token'
 }

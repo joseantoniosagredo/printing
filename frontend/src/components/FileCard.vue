@@ -8,6 +8,7 @@
                 <v-checkbox :label="t('color') + '?'" v-model="computedColor"></v-checkbox>
                 <v-checkbox :label="t('binded') + '?'" v-model="computedBind"></v-checkbox>
                 <v-checkbox :label ="t('doubleSide') + '?'" v-model="computedDuobleSided"></v-checkbox>
+                <v-checkbox :label ="t('stapled') + '?'" v-model="computedStapled"></v-checkbox>
             </div>
             <div>
                 <label>{{t("pages")}}</label>
@@ -83,6 +84,14 @@ export default {
             },
             set(value){
                 this.$emit('update:bind',value)
+            }
+        },
+        computedStapled:{
+            get(){
+                return this.stapled
+            },
+            set(value){
+                this.$emit('update:stapled',value)
             }
         },
         totalPages(){

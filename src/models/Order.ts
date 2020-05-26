@@ -15,7 +15,8 @@ export type FileOrderPopulatedType = {
     group: number,
     bind: boolean,
     color:boolean,
-    copies:number
+    copies:number,
+    stapled: boolean
 }
 export type OrderType = {
     user: Types.ObjectId,
@@ -35,6 +36,7 @@ const schema = new Schema({
         group: { type: Number, required: true },
         bind: { type: Boolean, required: true },
         color: { type: Boolean, required: true },
+        stapled:{ type: Boolean, required: true },
         copies: { type: Number, required: true },
     }],
     closed: { type: Boolean, required: true,default:false },
